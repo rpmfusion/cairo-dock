@@ -17,7 +17,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	0.3.2
+%global		fedora_main_rel	0.4
 
 
 %if 0%{?released} < 1
