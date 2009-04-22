@@ -1,0 +1,13 @@
+Index: stacks/src/applet-load-icons.c
+===================================================================
+--- stacks/src/applet-load-icons.c	(revision 1677)
++++ stacks/src/applet-load-icons.c	(working copy)
+@@ -193,7 +193,7 @@
+ 		if (g_list_length (pStacksIconList) == 1)  //Sinon on a pas l'icône qui saute joyeusement.
+ 			CD_APPLET_CREATE_MY_SUBDOCK (pStacksIconList, myConfig.cRenderer);
+ 			
+-		cairo_dock_insert_icon_in_dock (pAddedIcon, myIcon->pSubDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON, CAIRO_DOCK_APPLY_RATIO, FALSE);
++		cairo_dock_insert_icon_in_dock (pAddedIcon, myIcon->pSubDock, ! CAIRO_DOCK_UPDATE_DOCK_SIZE, ! CAIRO_DOCK_ANIMATE_ICON);
+ 		cairo_dock_update_dock_size (myIcon->pSubDock);
+ 	}
+ 	else

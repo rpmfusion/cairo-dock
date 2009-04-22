@@ -6,24 +6,24 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	1
+%global		released	0
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.0
 %global		betaver		rc3
-%global		tarballver		svn1527_trunk
+%global		tarballver		svn1677_trunk
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	0.4
+%global		fedora_main_rel	5
 
 
 %if 0%{?released} < 1
 %global		fedora_rel	0.%{fedora_main_rel}.%{tarballver}
 %else
-%global		fedora_rel	%{fedora_main_rel}%{?betaver:.%betaver}
+%global		fedora_rel	%{?betaver:0.}%{fedora_main_rel}%{?betaver:.%betaver}
 %endif
 
 %if 0%{?released} >= 1
@@ -57,9 +57,10 @@ Source1:	http://download.berlios.de/cairo-dock/%{name}-themes-%{mainver}%{?betav
 #Source2:	http://download.berlios.de/cairo-dock/%{name}-plugins-%{mainver}%{?betaver:-%betaver}.tar.bz2
 Source2:	%{name}-plugins-%{mainver}%{?betaver:-%betaver}-modified.tar.bz2
 %endif
-# Very temporary, brought from svn trun rev. 1667
-Source100:	cairo-dock-2.0.0-rc3-missing-files.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+
+# plug-ins specific patches
+Patch100:	cairo-dock-rev1677-stacks.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -183,8 +184,9 @@ files for developing applications that use %{name}.
 ###
 %if %{build_themes}
 %setup -q -c -a 1 -a 2
+%else
+%setup -q -c -a 2
 %endif
-%setup -q -c -a 2 -a 100
 %{__ln_s} -f cairo-dock-%{mainver}%{?betaver:-%betaver} cairo-dock
 %if %{build_themes}
 %{__ln_s} -f cairo-dock-themes-%{mainver}%{?betaver:-%betaver} themes
@@ -192,10 +194,6 @@ files for developing applications that use %{name}.
 %{__ln_s} -f cairo-dock-plugins-%{mainver}%{?betaver:-%betaver} plug-ins
 %endif
 ###
-
-## Temporary
-##
-%{__cp} -a trunk/plug-ins/MISSING_FILES/* plug-ins/
 
 %if 0
 find . -type d -name \.svn | sort -r | xargs %{__rm} -rf
@@ -293,6 +291,7 @@ find dialog-rendering -type f \
 # mail: license conflict now resolved
 
 # stacks: directory fix
+%patch100 -p0 -b .compile
 %if 0%{?released} < 1
 %{__sed} -i.dir -e '/stacksdatadir/s|pluginsdir|pluginsdatadir|' \
 	stacks/configure.ac
@@ -311,16 +310,6 @@ do
 		configure
 done
 %endif
-
-# rhythmbox
-pushd rhythmbox/data/themes
-%{__sed} -i -e '/ipod/d' \
-%if 0%{?released}
-	Makefile.in
-%else
-	Makefile.am
-%endif
-popd
 
 # template: upstream says this is not needed
 %{__rm} -rf template/
@@ -452,8 +441,8 @@ do
 	%configure $CONFIGURE_OPTS
 	# Parallel make fails some times, but it is gerenally fast
 	# so do parallel make anyway first
-	%{__make} %{?_smp_mflags} -k || :
-	%{__make} -k || status=$((status+1))
+	%{__make} %{?_smp_mflags} || :
+	%{__make} || status=$((status+1))
 
 	cd ..
 done
@@ -689,6 +678,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Apr 23 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1677
+
 * Sat Apr 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.4.rc3
 - 2.0.0 rc3
 - Move to rpmfusion
