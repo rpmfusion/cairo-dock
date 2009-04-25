@@ -11,8 +11,8 @@
 %global		build_other	1
 
 %global		mainver		2.0.0
-%global		betaver		rc3
-%global		tarballver		svn1677_trunk
+%global		betaver		rc4
+%global		tarballver		svn1689_trunk
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -33,7 +33,7 @@
 %if %{build_other} < 1
 %global		build_webkit	1
 %endif
-%global		build_themes	0
+%global		build_themes	1
 
 
 Name:		cairo-dock
@@ -273,20 +273,15 @@ find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 	configure
 %endif
 
+# Toons
+%{__sed} -i.tools \
+	-e 's|^\([ \t][ \t]*\)\(data/themes/\)|\1Toons/\2|' \
+	configure.ac
+
 # dialog-rendering
 find dialog-rendering -type f \
 	\( -not -path '*/.svn/*' -and -not -name \*.png \) \
 	| xargs %{__sed} -i -e 's|\r||'
-
-# dustbin
-%{__sed} -i.ppc64 \
-	-e 's|g_atomic_pointer_get|g_atomic_int_get|' \
-	dustbin/src/applet-trashes-manager.c
-
-# keyboard-indicator
-%{__sed} -i.po \
-	-e 's|@GETTEXT_CD_PKG@|@GETTEXT_KEYBOARD_INDICATOR@|' \
-	keyboard-indicator/po/Makefile.in.in
 
 # mail: license conflict now resolved
 
@@ -297,31 +292,8 @@ find dialog-rendering -type f \
 	stacks/configure.ac
 %endif
 
-# quick-browser, Toons
-# Not imported into released tarball yet
-%if 0%{?released}
-for plugs in \
-	quick-browser \
-	Toons
-do	
-	%{__sed} -i.p2 \
-		-e "/ac_config_files/s|${plugs}/[^ ][^ ]*| |g" \
-		-e "\@CONFIG_FILES=.*${plugs}@d" \
-		configure
-done
-%endif
-
 # template: upstream says this is not needed
 %{__rm} -rf template/
-
-# weblets
-# Now for weblet plugin, webkit is used on Fedora, not gecko
-cd weblets/
-%{__sed} -i.gettext \
-	-e '/^GETTEXT_PACKAGE/s|@GETTEXT_PACKAGE@|@GETTEXT_WEBLETS@|' \
-	po/Makefile.in.in
-
-cd ..
 
 
 # First deal with subdirs in configure.ac of topdir, then else
@@ -415,7 +387,7 @@ cd ../plug-ins
 # First deal with subdirs in topdir configure.ac, then else
 
 %configure \
-	--enable-gio \
+	--enable-gio-in-gmenu \
 
 # Parallel make fails some times, but it is gerenally fast
 # so do parallel make anyway first
@@ -678,8 +650,8 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Apr 23 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1677
+* Sun Apr 26 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1689
 
 * Sat Apr 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.4.rc3
 - 2.0.0 rc3
