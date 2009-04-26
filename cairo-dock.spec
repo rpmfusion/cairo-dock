@@ -106,11 +106,6 @@ BuildRequires:	Thunar-devel
 BuildRequires:	WebKit-gtk-devel
 %endif
 
-#################################################
-########## VERY TEMPORARILY ###############
-ExcludeArch:	ppc64
-#################################################
-
 # Obsoletes moved to main package
 # Switch to Webkit, always obsolete gecko (and _not_ provide it)
 Obsoletes:	%{name}-plug-ins-gecko < %{version}-%{release}
