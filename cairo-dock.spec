@@ -17,7 +17,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	5
+%global		fedora_main_rel	6
 
 
 %if 0%{?released} < 1
@@ -51,11 +51,7 @@ Source0:	http://download.berlios.de/cairo-dock/%{name}-%{mainver}%{?betaver:-%be
 %if %{build_themes} 
 Source1:	http://download.berlios.de/cairo-dock/%{name}-themes-%{mainver}%{?betaver:-%betaver}.tar.bz2
 %endif
-# Some trademarked icons under Cairo-Penguin should be removed
-# After unpacking tarball, remove:
-#   - Cairo-Penguin/data/themes/{Mario,The_Simpsons}
-#Source2:	http://download.berlios.de/cairo-dock/%{name}-plugins-%{mainver}%{?betaver:-%betaver}.tar.bz2
-Source2:	%{name}-plugins-%{mainver}%{?betaver:-%betaver}-modified.tar.bz2
+Source2:	http://download.berlios.de/cairo-dock/%{name}-plugins-%{mainver}%{?betaver:-%betaver}.tar.bz2
 %endif
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -126,6 +122,9 @@ Linux desktop. It has a family-likeness with OSX dock,
 but with more options.
 
 %package	themes
+# Kill AutoProv to remove unwilling desktop prov
+AutoProv:	No
+BuildArch:	noarch
 Summary:	Additional themes for %{name}
 Group:		User Interface/Desktops
 Requires:	%{name} = %{version}-%{release}
@@ -245,38 +244,6 @@ cd ../plug-ins
 find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
-
-# Cairo-Penguin
-## Removing trademarked icons
-## The following directories are (should be) also removed from the tarball
-##
-## Note:
-## This is under discussion with upstream
-%{__sed} -i.icon \
-	-e '/The_Simpsons/d' \
-	-e '/Mario/d' \
-%if 0%{?released} < 1
-	Cairo-Penguin/data/themes/Makefile.am \
-	configure.ac
-%else
-	Cairo-Penguin/data/themes/Makefile.in
-%endif
-%if 0%{?released} < 1
-%{__sed} -i.icon2 -e '$s|\\$||' Cairo-Penguin/data/themes/Makefile.am
-%else
-%{__sed} -i.icon2 -e 's|SantaClaus \\|SantaClaus|' Cairo-Penguin/data/themes/Makefile.in
-%{__sed} -i.icon \
-	-e '/ac_config_files/s|Cairo-Penguin[^ ][^ ]*/Mario/Makefile| |g' \
-	-e '/ac_config_files/s|Cairo-Penguin[^ ][^ ]*/The_Simpsons/Makefile| |g' \
-	-e '\@CONFIG_FILES=.*Mario/Makefile@d' \
-	-e '\@CONFIG_FILES=.*The_Simpsons/Makefile@d' \
-	configure
-%endif
-
-# Toons
-%{__sed} -i.tools \
-	-e 's|^\([ \t][ \t]*\)\(data/themes/\)|\1Toons/\2|' \
-	configure.ac
 
 # dialog-rendering
 find dialog-rendering -type f \
@@ -650,8 +617,12 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sun Apr 26 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+* Mon Apr 27 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
 - rev 1689
+
+* Mon Apr 27 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.6.svn1689_trunk
+- Kill AutoProv on -themes subpackage to avoid unneeded desktop prov
+- Build -themes subpackage as noarch
 
 * Sat Apr 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.4.rc3
 - 2.0.0 rc3
