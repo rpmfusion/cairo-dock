@@ -12,7 +12,7 @@
 
 %global		mainver		2.0.0
 %global		betaver		rc4
-%global		tarballver		svn1690_trunk
+%global		tarballver		svn1691_trunk
 
 %global		build_webkit	1
 %global		build_xfce	1
