@@ -12,7 +12,7 @@
 
 %global		mainver		2.0.0
 %global		betaver		rc4
-%global		tarballver		svn1689_trunk
+%global		tarballver		svn1690_trunk
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -81,10 +81,8 @@ BuildRequires:	perl(XML::Parser)
 
 # For plug-ins
 BuildRequires:	alsa-lib-devel
-BuildRequires:	gnome-keyring-devel
 BuildRequires:	gnome-menus-devel
 BuildRequires:	gnome-vfs2-devel
-BuildRequires:	gnutls-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
 BuildRequires:	libxklavier-devel
@@ -617,8 +615,8 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Mon Apr 27 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1689
+* Tue Apr 28 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1691
 
 * Mon Apr 27 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.6.svn1689_trunk
 - Kill AutoProv on -themes subpackage to avoid unneeded desktop prov
