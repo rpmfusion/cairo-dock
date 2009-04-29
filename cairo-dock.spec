@@ -6,18 +6,20 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	0
+%global		released	1
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.0
-%global		betaver		rc4
-%global		tarballver		svn1691_trunk
+%global		betaver		rc5
+%global		tarballver		svn1692_trunk
+
+%global		build_themes	0
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	6
+%global		fedora_main_rel	7
 
 
 %if 0%{?released} < 1
@@ -33,7 +35,6 @@
 %if %{build_other} < 1
 %global		build_webkit	1
 %endif
-%global		build_themes	1
 
 
 Name:		cairo-dock
@@ -53,6 +54,8 @@ Source1:	http://download.berlios.de/cairo-dock/%{name}-themes-%{mainver}%{?betav
 %endif
 Source2:	http://download.berlios.de/cairo-dock/%{name}-plugins-%{mainver}%{?betaver:-%betaver}.tar.bz2
 %endif
+## Again..
+Source10:	cairo-dock-2.0.0-rc5-missing-files.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
@@ -182,13 +185,16 @@ files for developing applications that use %{name}.
 %if %{build_themes}
 %setup -q -c -a 1 -a 2
 %else
-%setup -q -c -a 2
+%setup -q -c -a 2 -a 10
 %endif
 %{__ln_s} -f cairo-dock-%{mainver}%{?betaver:-%betaver} cairo-dock
 %if %{build_themes}
 %{__ln_s} -f cairo-dock-themes-%{mainver}%{?betaver:-%betaver} themes
 %endif
 %{__ln_s} -f cairo-dock-plugins-%{mainver}%{?betaver:-%betaver} plug-ins
+
+cp -a Missing-files/plug-ins/* plug-ins/ 
+
 %endif
 ###
 
@@ -250,9 +256,22 @@ find dialog-rendering -type f \
 
 # mail: license conflict now resolved
 
+# quick-browse
+# Not imported into released tarball yet
+%if 0%{?released}
+for plugs in \
+	quick-browser
+do	
+	%{__sed} -i.p2 \
+		-e "/ac_config_files/s|${plugs}/[^ ][^ ]*| |g" \
+		-e "\@CONFIG_FILES=.*${plugs}@d" \
+		configure
+done
+%endif
+
 # stacks: directory fix
-%patch100 -p0 -b .compile
 %if 0%{?released} < 1
+%patch100 -p0 -b .compile
 %{__sed} -i.dir -e '/stacksdatadir/s|pluginsdir|pluginsdatadir|' \
 	stacks/configure.ac
 %endif
@@ -615,8 +634,8 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Tue Apr 28 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1691
+* Wed Apr 29 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.7.rc5
+- 2.0.0 rc5
 
 * Mon Apr 27 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.6.svn1689_trunk
 - Kill AutoProv on -themes subpackage to avoid unneeded desktop prov
