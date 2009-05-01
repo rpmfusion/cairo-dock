@@ -6,13 +6,13 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	1
+%global		released	0
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.0
 %global		betaver		rc5
-%global		tarballver		svn1692_trunk
+%global		tarballver		svn1698_trunk
 
 %global		build_themes	0
 
@@ -102,6 +102,10 @@ BuildRequires:	Thunar-devel
 # Now using webkit, not gecko
 BuildRequires:	WebKit-gtk-devel
 %endif
+# Requires related to commands used internally
+# in cairo-dock
+Requires:	findutils
+Requires:	wget
 
 # Obsoletes moved to main package
 # Switch to Webkit, always obsolete gecko (and _not_ provide it)
@@ -255,19 +259,6 @@ find dialog-rendering -type f \
 	| xargs %{__sed} -i -e 's|\r||'
 
 # mail: license conflict now resolved
-
-# quick-browse
-# Not imported into released tarball yet
-%if 0%{?released}
-for plugs in \
-	quick-browser
-do	
-	%{__sed} -i.p2 \
-		-e "/ac_config_files/s|${plugs}/[^ ][^ ]*| |g" \
-		-e "\@CONFIG_FILES=.*${plugs}@d" \
-		configure
-done
-%endif
 
 # stacks: directory fix
 %if 0%{?released} < 1
@@ -634,6 +625,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri May  1 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1698
+
 * Wed Apr 29 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.7.rc5
 - 2.0.0 rc5
 
