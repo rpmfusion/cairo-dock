@@ -54,8 +54,6 @@ Source1:	http://download.berlios.de/cairo-dock/%{name}-themes-%{mainver}%{?betav
 %endif
 Source2:	http://download.berlios.de/cairo-dock/%{name}-plugins-%{mainver}%{?betaver:-%betaver}.tar.bz2
 %endif
-## Again..
-Source10:	cairo-dock-2.0.0-rc5-missing-files.tar.bz2
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
@@ -189,16 +187,13 @@ files for developing applications that use %{name}.
 %if %{build_themes}
 %setup -q -c -a 1 -a 2
 %else
-%setup -q -c -a 2 -a 10
+%setup -q -c -a 2
 %endif
 %{__ln_s} -f cairo-dock-%{mainver}%{?betaver:-%betaver} cairo-dock
 %if %{build_themes}
 %{__ln_s} -f cairo-dock-themes-%{mainver}%{?betaver:-%betaver} themes
 %endif
 %{__ln_s} -f cairo-dock-plugins-%{mainver}%{?betaver:-%betaver} plug-ins
-
-cp -a Missing-files/plug-ins/* plug-ins/ 
-
 %endif
 ###
 
