@@ -12,7 +12,7 @@
 
 %global		mainver		2.0.0
 %global		betaver		rc5
-%global		tarballver		svn1698_trunk
+%global		tarballver		svn1702_trunk
 
 %global		build_themes	0
 
@@ -620,8 +620,8 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Fri May  1 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1698
+* Mon May  4 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1702
 
 * Wed Apr 29 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.7.rc5
 - 2.0.0 rc5
