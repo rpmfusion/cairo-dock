@@ -1,0 +1,11 @@
+--- plug-ins/dock-rendering/src/rendering-init.c.debug	2009-05-08 03:09:55.000000000 +0900
++++ plug-ins/dock-rendering/src/rendering-init.c	2009-05-10 10:44:35.000000000 +0900
+@@ -13,7 +13,7 @@
+ #include "rendering-parabole.h"
+ #include "rendering-3D-plane.h"
+ #include "rendering-rainbow.h"
+-#include "rendering-diapo.h"
++//#include "rendering-diapo.h"
+ #include "rendering-diapo-simple.h"
+ #include "rendering-curve.h"
+ #include "rendering-commons.h"

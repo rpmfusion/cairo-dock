@@ -6,12 +6,12 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	0
+%global		released	1
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.0
-%global		betaver		rc5
+%undefine		betaver		
 %global		tarballver		svn1739_trunk
 
 %global		build_themes	0
@@ -19,7 +19,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	7
+%global		fedora_main_rel	1
 
 
 %if 0%{?released} < 1
@@ -58,6 +58,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
+Patch101:	cairo-dock-2.0.0-dock-rendering-compile.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -252,6 +253,9 @@ find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 find dialog-rendering -type f \
 	\( -not -path '*/.svn/*' -and -not -name \*.png \) \
 	| xargs %{__sed} -i -e 's|\r||'
+
+# dock-rendering
+%patch101 -p1 -b .compile
 
 # mail: license conflict now resolved
 
@@ -620,8 +624,8 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sat May  9 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1739
+* Sun May 10 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-1
+- 2.0.0 release
 
 * Wed Apr 29 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-0.7.rc5
 - 2.0.0 rc5
