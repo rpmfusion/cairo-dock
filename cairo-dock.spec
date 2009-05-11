@@ -19,7 +19,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2.respin1
 
 
 %if 0%{?released} < 1
@@ -58,7 +58,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-Patch101:	cairo-dock-2.0.0-dock-rendering-compile.patch
+#Patch101:	cairo-dock-2.0.0-dock-rendering-compile.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -255,7 +255,7 @@ find dialog-rendering -type f \
 	| xargs %{__sed} -i -e 's|\r||'
 
 # dock-rendering
-%patch101 -p1 -b .compile
+#%%patch101 -p1 -b .compile
 
 # mail: license conflict now resolved
 
@@ -624,6 +624,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon May 11 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-2.respin1
+- Tarballs respun
+
 * Sun May 10 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-1
 - 2.0.0 release
 
