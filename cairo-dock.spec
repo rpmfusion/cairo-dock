@@ -7,26 +7,22 @@
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
 %global		released	1
+%undefine		pre_release
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.0
+%global		mainver		2.0.1
 %undefine		betaver		
-%global		tarballver		svn1739_trunk
 
 %global		build_themes	0
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2.respin1
+%global		fedora_main_rel	1
 
 
-%if 0%{?released} < 1
-%global		fedora_rel	0.%{fedora_main_rel}.%{tarballver}
-%else
-%global		fedora_rel	%{?betaver:0.}%{fedora_main_rel}%{?betaver:.%betaver}
-%endif
+%global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
 
 %if 0%{?released} >= 1
 %global		build_other	0
@@ -46,7 +42,7 @@ Group:		User Interface/Desktops
 License:	GPLv3+
 URL:		http://www.cairo-dock.org/
 %if 0%{?released} < 1
-Source0:	%{name}-sources-%{tarballver}.tar.bz2
+Source0:	%{name}-sources-%{betaver}.tar.bz2
 %else
 Source0:	http://download.berlios.de/cairo-dock/%{name}-%{mainver}%{?betaver:-%betaver}.tar.bz2
 %if %{build_themes} 
@@ -105,6 +101,7 @@ BuildRequires:	WebKit-gtk-devel
 # in cairo-dock
 Requires:	findutils
 Requires:	wget
+Requires:	xterm
 
 # Obsoletes moved to main package
 # Switch to Webkit, always obsolete gecko (and _not_ provide it)
@@ -624,6 +621,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun May 17 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.1-1
+- 2.0.1
+
 * Mon May 11 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.0-2.respin1
 - Tarballs respun
 
