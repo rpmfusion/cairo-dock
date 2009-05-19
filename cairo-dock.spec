@@ -11,7 +11,7 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.1
+%global		mainver		2.0.2
 %undefine		betaver		
 
 %global		build_themes	0
@@ -621,6 +621,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue May 19 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.2-1
+- 2.0.2
+
 * Sun May 17 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.1-1
 - 2.0.1
 
