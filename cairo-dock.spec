@@ -7,11 +7,11 @@
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
 %global		released	1
-%undefine		pre_release
+%undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.2
+%global		mainver		2.0.3
 %undefine		betaver		
 
 %global		build_themes	0
@@ -621,6 +621,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun May 24 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.3-1
+- 2.0.3
+
 * Tue May 19 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.2-1
 - 2.0.2
 
