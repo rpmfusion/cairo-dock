@@ -19,7 +19,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -177,17 +177,6 @@ The %{name}-devel package contains libraries, build data, and header
 files for developing applications that use %{name}.
 
 %prep
-
-set +x
-echo "Tried mock build on x86_64 machine and it seems"
-echo "that something strange is occuring on cairo-dock/po"
-echo "directory (however koji scratch build succeeds...)"
-echo
-echo "I will investigate why......"
-set -x
-
-exit 1
-
 %if 0%{released} < 1
 %setup -q -c
 %else
@@ -346,6 +335,10 @@ pushd cairo-dock
 # --enable-glitz cannot be set because cairo-glitz.h is missing
 # (Fedora cairo does not support glitz)
 %configure
+
+# Workaround to avoid endless loop on po/
+touch po/stamp-it
+
 %{__make} %{?_smp_mflags} || status=$((status+1))
 
 # For plug-ins & themes
@@ -370,6 +363,10 @@ cd ../plug-ins
 
 %configure \
 	--enable-gio-in-gmenu \
+
+
+# Workaround to avoid endless loop on po/
+touch po/stamp-it
 
 # Parallel make fails some times, but it is gerenally fast
 # so do parallel make anyway first
@@ -632,6 +629,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon May 25 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.3-2
+- Workaround to avoid endless loop on po/ directory
+
 * Sun May 24 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.3-1
 - 2.0.3
 
