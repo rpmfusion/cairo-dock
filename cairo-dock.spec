@@ -177,6 +177,17 @@ The %{name}-devel package contains libraries, build data, and header
 files for developing applications that use %{name}.
 
 %prep
+
+set +x
+echo "Tried mock build on x86_64 machine and it seems"
+echo "that something strange is occuring on cairo-dock/po"
+echo "directory (however koji scratch build succeeds...)"
+echo
+echo "I will investigate why......"
+set -x
+
+exit 1
+
 %if 0%{released} < 1
 %setup -q -c
 %else
