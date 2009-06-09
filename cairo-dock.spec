@@ -6,13 +6,13 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	0
-%define		pre_release	1
+%global		released	1
+%undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.4
-%define		betaver		svn1809_trunk
+%undefine		betaver		
 
 %global		build_themes	0
 
@@ -258,9 +258,11 @@ find dialog-rendering -type f \
 %endif
 
 # System-Monitor
+%if 0%{?released} < 1
 %{__sed} -i.typo \
 	-e 's|CPUSAGE|SYSTEM_MONITOR|' \
 	System-Monitor/po/Makefile.in.in
+%endif
 
 # template: upstream says this is not needed
 %{__rm} -rf template/
@@ -628,8 +630,8 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Mon Jun  8 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1809
+* Tue Jun  9 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.4-1
+- 2.0.4
 
 * Mon May 25 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.3-2
 - Workaround to avoid endless loop on po/ directory
