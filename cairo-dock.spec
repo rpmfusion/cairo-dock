@@ -11,7 +11,7 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.3
+%global		mainver		2.0.4
 %undefine		betaver		
 
 %global		build_themes	0
@@ -19,7 +19,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -54,7 +54,6 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-#Patch101:	cairo-dock-2.0.0-dock-rendering-compile.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -251,16 +250,18 @@ find dialog-rendering -type f \
 	\( -not -path '*/.svn/*' -and -not -name \*.png \) \
 	| xargs %{__sed} -i -e 's|\r||'
 
-# dock-rendering
-#%%patch101 -p1 -b .compile
-
-# mail: license conflict now resolved
-
 # stacks: directory fix
 %if 0%{?released} < 1
 %patch100 -p0 -b .compile
 %{__sed} -i.dir -e '/stacksdatadir/s|pluginsdir|pluginsdatadir|' \
 	stacks/configure.ac
+%endif
+
+# System-Monitor
+%if 0%{?released} < 1
+%{__sed} -i.typo \
+	-e 's|CPUSAGE|SYSTEM_MONITOR|' \
+	System-Monitor/po/Makefile.in.in
 %endif
 
 # template: upstream says this is not needed
@@ -629,6 +630,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jun  9 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.4-1
+- 2.0.4
+
 * Mon May 25 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.3-2
 - Workaround to avoid endless loop on po/ directory
 
