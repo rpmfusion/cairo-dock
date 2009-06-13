@@ -6,20 +6,20 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	1
+%global		released	0
 %undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.5
-%undefine		betaver		
+%define		betaver		svn1816_trunk
 
 %global		build_themes	0
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -54,6 +54,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
+Patch101:	cairo-dock-rev1816-dnd2share.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -249,6 +250,9 @@ find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 find dialog-rendering -type f \
 	\( -not -path '*/.svn/*' -and -not -name \*.png \) \
 	| xargs %{__sed} -i -e 's|\r||'
+
+# dnd2share
+%patch101 -p1 -b .compile2
 
 # stacks: directory fix
 %if 0%{?released} < 1
@@ -630,6 +634,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Jun 14 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1816
+
 * Thu Jun 11 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.5-1
 - 2.0.5
 
