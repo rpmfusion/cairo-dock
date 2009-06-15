@@ -1,0 +1,24 @@
+Index: cairo-dock/src/cairo-dock-class-manager.c
+===================================================================
+--- cairo-dock/src/cairo-dock-class-manager.c	(revision 1821)
++++ cairo-dock/src/cairo-dock-class-manager.c	(working copy)
+@@ -27,6 +27,7 @@
+ #include "cairo-dock-internal-icons.h"
+ #include "cairo-dock-container.h"
+ #include "cairo-dock-class-manager.h"
++#include "cairo-dock-dock-facility.h"
+ 
+ extern CairoDock *g_pMainDock;
+ extern gboolean g_bEasterEggs;
+Index: cairo-dock/src/cairo-dock-internal-labels.c
+===================================================================
+--- cairo-dock/src/cairo-dock-internal-labels.c	(revision 1821)
++++ cairo-dock/src/cairo-dock-internal-labels.c	(working copy)
+@@ -17,6 +17,7 @@
+ #include "cairo-dock-internal-dialogs.h"
+ #include "cairo-dock-internal-icons.h"
+ #include "cairo-dock-container.h"
++#include "cairo-dock-dock-facility.h"
+ #define _INTERNAL_MODULE_
+ #include "cairo-dock-internal-labels.h"
+ 

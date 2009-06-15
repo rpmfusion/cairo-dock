@@ -6,13 +6,17 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
+# Use -gdwarf-2 until /usr/lib/rpm/debugedit supports -gdwarf-3 (bug 505774)
+%global	optflags_	%optflags
+%global	optflags	%optflags_ -gdwarf-2
+
 %global		released	0
 %undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.5
-%define		betaver		svn1816_trunk
+%define		betaver		svn1821_trunk
 
 %global		build_themes	0
 
@@ -54,7 +58,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-Patch101:	cairo-dock-rev1816-dnd2share.patch
+Patch101:	cairo-dock-rev1821-cairodock.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -204,6 +208,9 @@ pushd .
 # A. main
 cd cairo-dock
 
+# Patch
+%patch101 -p1 -b .compile
+
 # permission
 for dir in */
 do
@@ -246,26 +253,19 @@ find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
 
+# System-monitor
+%{__cp} -p nVidia/data/nvidia-config System-Monitor/data/
+
 # dialog-rendering
 find dialog-rendering -type f \
 	\( -not -path '*/.svn/*' -and -not -name \*.png \) \
 	| xargs %{__sed} -i -e 's|\r||'
-
-# dnd2share
-%patch101 -p1 -b .compile2
 
 # stacks: directory fix
 %if 0%{?released} < 1
 %patch100 -p0 -b .compile
 %{__sed} -i.dir -e '/stacksdatadir/s|pluginsdir|pluginsdatadir|' \
 	stacks/configure.ac
-%endif
-
-# System-Monitor
-%if 0%{?released} < 1
-%{__sed} -i.typo \
-	-e 's|CPUSAGE|SYSTEM_MONITOR|' \
-	System-Monitor/po/Makefile.in.in
 %endif
 
 # template: upstream says this is not needed
@@ -569,6 +569,9 @@ set -x
 
 popd # from $RPM_BUILD_ROOT
 
+# ?????
+rm -f %{buildroot}%{_libdir}/libcairo-dock.*
+
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
@@ -634,8 +637,8 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Sun Jun 14 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1816
+* Mon Jun 15 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1821
 
 * Thu Jun 11 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.5-1
 - 2.0.5
