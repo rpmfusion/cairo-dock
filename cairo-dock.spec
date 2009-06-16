@@ -16,7 +16,7 @@
 %global		build_other	1
 
 %global		mainver		2.0.5
-%define		betaver		svn1821_trunk
+%define		betaver		svn1823_trunk
 
 %global		build_themes	0
 
@@ -58,7 +58,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-Patch101:	cairo-dock-rev1821-cairodock.patch
+Patch101:	cairo-dock-rev1823-cairodock.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -252,9 +252,6 @@ cd ../plug-ins
 find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
-
-# System-monitor
-%{__cp} -p nVidia/data/nvidia-config System-Monitor/data/
 
 # dialog-rendering
 find dialog-rendering -type f \
@@ -569,7 +566,7 @@ set -x
 
 popd # from $RPM_BUILD_ROOT
 
-# ?????
+# For now these are not needed
 rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 
 %clean
@@ -637,8 +634,8 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Mon Jun 15 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1821
+* Wed Jun 17 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1823
 
 * Thu Jun 11 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.5-1
 - 2.0.5
