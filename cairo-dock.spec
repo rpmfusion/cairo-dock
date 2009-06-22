@@ -7,19 +7,19 @@
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
 %global		released	0
-%undefine		pre_release	
+%define		pre_release	1
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.5
-%define		betaver		svn1826_trunk
+%global		mainver		2.0.6
+%define		betaver		svn1832_trunk
 
 %global		build_themes	0
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -54,7 +54,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-Patch200:	xorg-x11-proto-devel-workaround-bz505774.patch
+#Patch200:	xorg-x11-proto-devel-workaround-bz505774.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -202,6 +202,7 @@ find . -type d -name \*CVS\* | sort -r | xargs %{__rm} -rf
 
 pushd .
 
+%if 0
 ####
 # Workaround for bz 506656
 mkdir -p .%{_includedir}/X11/extensions
@@ -213,6 +214,7 @@ popd
 %global optflags_ %{optflags}
 %global optflags %{optflags_} -I%{_builddir}/%{name}-%{version}/%{_includedir}
 ####
+%endif
 
 # A. main
 cd cairo-dock
@@ -642,8 +644,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Thu Jun 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1826
+* Tue Jun 23 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1832
+- Remove workaround for bug 506656
 
 * Thu Jun 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
 - rev 1825
