@@ -12,7 +12,7 @@
 %global		build_other	1
 
 %global		mainver		2.0.6
-%define		betaver		svn1832_trunk
+%define		betaver		svn1833_trunk
 
 %global		build_themes	0
 
@@ -644,8 +644,8 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
-* Tue Jun 23 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- rev 1832
+* Thu Jun 25 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1833
 - Remove workaround for bug 506656
 
 * Thu Jun 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
