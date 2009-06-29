@@ -11,7 +11,7 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.5
+%global		mainver		2.0.6
 %undefine		betaver		
 
 %global		build_themes	0
@@ -200,8 +200,11 @@ find . -type d -name \*CVS\* | sort -r | xargs %{__rm} -rf
 %endif
 
 pushd .
+
 # A. main
 cd cairo-dock
+
+# Patch
 
 # permission
 for dir in */
@@ -255,13 +258,6 @@ find dialog-rendering -type f \
 %patch100 -p0 -b .compile
 %{__sed} -i.dir -e '/stacksdatadir/s|pluginsdir|pluginsdatadir|' \
 	stacks/configure.ac
-%endif
-
-# System-Monitor
-%if 0%{?released} < 1
-%{__sed} -i.typo \
-	-e 's|CPUSAGE|SYSTEM_MONITOR|' \
-	System-Monitor/po/Makefile.in.in
 %endif
 
 # template: upstream says this is not needed
@@ -565,6 +561,9 @@ set -x
 
 popd # from $RPM_BUILD_ROOT
 
+# For now these are not needed
+rm -f %{buildroot}%{_libdir}/libcairo-dock.*
+
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
@@ -630,6 +629,22 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Jun 27 2009 Mamoru Tasaka <mtaaska@ioa.s.u-tokyo.ac.jp> - 2.0.6-1
+- 2.0.6
+
+* Thu Jun 25 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1833
+- Remove workaround for bug 506656
+
+* Thu Jun 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1825
+- Remove debugedit workaround as bug 505774 is solved.
+- Workaround for X11/extensions/XTest.h bug 506656
+
+* Mon Jun 15 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rev 1821
+- Compile with -gdwarf-2 until bug 505774 is resolved.
+
 * Thu Jun 11 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.5-1
 - 2.0.5
 
