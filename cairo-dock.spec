@@ -6,13 +6,13 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	0
-%define		pre_release	1
+%global		released	1
+%undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.6
-%define		betaver		svn1833_trunk
+%undefine		betaver		
 
 %global		build_themes	0
 
@@ -54,7 +54,6 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-#Patch200:	xorg-x11-proto-devel-workaround-bz505774.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -201,20 +200,6 @@ find . -type d -name \*CVS\* | sort -r | xargs %{__rm} -rf
 %endif
 
 pushd .
-
-%if 0
-####
-# Workaround for bz 506656
-mkdir -p .%{_includedir}/X11/extensions
-pushd .%{_includedir}/X11/extensions
-cp -p %{_includedir}/X11/extensions/XTest.h .
-%patch200 -p4
-popd
-
-%global optflags_ %{optflags}
-%global optflags %{optflags_} -I%{_builddir}/%{name}-%{version}/%{_includedir}
-####
-%endif
 
 # A. main
 cd cairo-dock
@@ -644,6 +629,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Jun 27 2009 Mamoru Tasaka <mtaaska@ioa.s.u-tokyo.ac.jp> - 2.0.6-1
+- 2.0.6
+
 * Thu Jun 25 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
 - rev 1833
 - Remove workaround for bug 506656
