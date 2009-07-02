@@ -6,20 +6,20 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	1
+%global		released	0
 %undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		mainver		2.0.6
-%undefine		betaver		
+%define		betaver		svn1841_trunk
 
 %global		build_themes	0
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -83,6 +83,11 @@ BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
 BuildRequires:	libxklavier-devel
+# (for now make it sure that buildtree used is correctly synced with rawhide tree
+#  and new libxklavier is correctly used)
+%if 0%{?fedora} >= 12
+BuildRequires:	libxklavier-devel >= 4.0
+%endif
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
@@ -629,6 +634,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Jul  2 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- F-12: rebuild against new libxklavier
+
 * Sat Jun 27 2009 Mamoru Tasaka <mtaaska@ioa.s.u-tokyo.ac.jp> - 2.0.6-1
 - 2.0.6
 
