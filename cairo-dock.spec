@@ -6,20 +6,20 @@
 # cd trunk
 # tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
 
-%global		released	0
+%global		released	1
 %undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.6
-%define		betaver		svn1841_trunk
+%global		mainver		2.0.7
+%undefine		betaver		
 
 %global		build_themes	0
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -634,6 +634,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Jul  3 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.7-1
+- 2.0.7
+
 * Thu Jul  2 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
 - F-12: rebuild against new libxklavier
 
