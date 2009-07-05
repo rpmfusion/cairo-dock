@@ -11,7 +11,7 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.6
+%global		mainver		2.0.7
 %undefine		betaver		
 
 %global		build_themes	0
@@ -83,6 +83,11 @@ BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
 BuildRequires:	libxklavier-devel
+# (for now make it sure that buildtree used is correctly synced with rawhide tree
+#  and new libxklavier is correctly used)
+%if 0%{?fedora} >= 12
+BuildRequires:	libxklavier-devel >= 4.0
+%endif
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
@@ -629,6 +634,12 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Jul  3 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.7-1
+- 2.0.7
+
+* Thu Jul  2 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- F-12: rebuild against new libxklavier
+
 * Sat Jun 27 2009 Mamoru Tasaka <mtaaska@ioa.s.u-tokyo.ac.jp> - 2.0.6-1
 - 2.0.6
 
