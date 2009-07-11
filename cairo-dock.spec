@@ -11,7 +11,7 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.7
+%global		mainver		2.0.8
 %undefine		betaver		
 
 %global		build_themes	0
@@ -634,6 +634,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Jul 12 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.8-1
+- 2.0.8
+
 * Fri Jul  3 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.7-1
 - 2.0.7
 
