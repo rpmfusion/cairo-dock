@@ -57,11 +57,11 @@ Patch100:	cairo-dock-rev1677-stacks.patch
 
 %if ! %{released}
 BuildRequires:	automake
-BuildRequires:	intltool
 BuildRequires:	libtool
 %endif
 BuildRequires:	desktop-file-utils
 BuildRequires:	gettext
+BuildRequires:	intltool
 
 # For main package
 BuildRequires:	dbus-glib-devel
