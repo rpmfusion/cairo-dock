@@ -11,10 +11,8 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.0.8.2
+%global		mainver		2.1.0
 %undefine		betaver		
-
-%global		build_themes	0
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -26,10 +24,6 @@
 
 %if 0%{?released} >= 1
 %global		build_other	0
-%endif
-# Now WebKit plug-in is (will be) included in released tarball
-%if %{build_other} < 1
-%global		build_webkit	1
 %endif
 
 
@@ -44,11 +38,8 @@ URL:		http://www.cairo-dock.org/
 %if 0%{?released} < 1
 Source0:	%{name}-sources-%{betaver}.tar.bz2
 %else
-Source0:	http://download.berlios.de/cairo-dock/%{name}-%{mainver}%{?betaver:-%betaver}.tar.bz2
-%if %{build_themes} 
-Source1:	http://download.berlios.de/cairo-dock/%{name}-themes-%{mainver}%{?betaver:-%betaver}.tar.bz2
-%endif
-Source2:	http://download.berlios.de/cairo-dock/%{name}-plugins-%{mainver}%{?betaver:-%betaver}.tar.bz2
+Source0:	http://launchpad.net/cairo-dock-core/2.1/2.1.0/+download/cairo-dock-%{mainver}%{?betaver:-%betaver}.tar.gz
+Source2:	http://launchpad.net/cairo-dock-plug-ins/2.1/2.1.0/+download/cairo-dock-plugins-%{mainver}%{?betaver:-%betaver}.tar.gz
 %endif
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -83,11 +74,6 @@ BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
 BuildRequires:	libxklavier-devel
-# (for now make it sure that buildtree used is correctly synced with rawhide tree
-#  and new libxklavier is correctly used)
-%if 0%{?fedora} >= 12
-BuildRequires:	libxklavier-devel >= 4.0
-%endif
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
@@ -117,25 +103,12 @@ Obsoletes:	%{name}-plug-ins-webkit < %{version}-%{release}
 Obsoletes:	%{name}-plug-ins-xfce < %{version}-%{release}
 %endif
 # cairo-dock-themes is obsoleted
-%if ! %{build_themes}
 Obsoletes:	%{name}-themes < %{version}-%{release}
-%endif
 
 %description
 An light eye-candy fully themable animated dock for any 
 Linux desktop. It has a family-likeness with OSX dock,
 but with more options.
-
-%package	themes
-# Kill AutoProv to remove unwilling desktop prov
-AutoProv:	No
-BuildArch:	noarch
-Summary:	Additional themes for %{name}
-Group:		User Interface/Desktops
-Requires:	%{name} = %{version}-%{release}
-
-%description	themes
-This package contains a set of additional themes for %{name}.
 
 %package	plug-ins
 Summary:	Plug-ins files for %{name}
@@ -186,15 +159,8 @@ files for developing applications that use %{name}.
 %else
 
 ###
-%if %{build_themes}
-%setup -q -c -a 1 -a 2
-%else
 %setup -q -c -a 2
-%endif
 %{__ln_s} -f cairo-dock-%{mainver}%{?betaver:-%betaver} cairo-dock
-%if %{build_themes}
-%{__ln_s} -f cairo-dock-themes-%{mainver}%{?betaver:-%betaver} themes
-%endif
 %{__ln_s} -f cairo-dock-plugins-%{mainver}%{?betaver:-%betaver} plug-ins
 %endif
 ###
@@ -233,15 +199,6 @@ autoreconf -i -f
 	-e 's|Icon=\*|Icon=cairo-dock|' \
 	data/cairo-dock*.desktop
 
-# B. themes
-%if %{build_themes}
-cd ../themes
-
-%if 0%{?released} < 1
-autoreconf -i -f
-%endif
-%endif
-
 # C. plug-ins
 cd ../plug-ins
 
@@ -253,10 +210,7 @@ find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
 
-# dialog-rendering
-find dialog-rendering -type f \
-	\( -not -path '*/.svn/*' -and -not -name \*.png \) \
-	| xargs %{__sed} -i -e 's|\r||'
+# Scooby-Do: see below
 
 # stacks: directory fix
 %if 0%{?released} < 1
@@ -350,25 +304,25 @@ export CFLAGS="%optflags -I$(pwd) -I$(pwd)/cairo-dock"
 export CPPFLAGS="%optflags -I$(pwd) -I$(pwd)/cairo-dock"
 export PKG_CONFIG_PATH=$(pwd):${PKG_CONFIG_PATH}
 
-# B themes
-%if %{build_themes}
-cd ../themes
-
-%configure
-%{__make} %{?_smp_mflags} || status=$((status+1))
-%endif
-
 # C plug-ins
 cd ../plug-ins
 
 # First deal with subdirs in topdir configure.ac, then else
-
 %configure \
 	--enable-gio-in-gmenu \
+	--enable-mail \
+	--enable-network-monitor \
+	--enable-scooby-do \
 
 
 # Workaround to avoid endless loop on po/
 touch po/stamp-it
+
+# Scooby-Do: workaround
+cd Scooby-Do
+touch config.status
+ln -sf ../libtool
+cd ..
 
 # Parallel make fails some times, but it is gerenally fast
 # so do parallel make anyway first
@@ -416,10 +370,6 @@ export PKG_CONFIG_PATH=$(pwd):${PKG_CONFIG_PATH}
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL="%{__install} -p"
 
-%{__chmod} 0755 $RPM_BUILD_ROOT%{_bindir}/*.sh
-# debian file, not useful
-%{__rm} -f $RPM_BUILD_ROOT%{_bindir}/cairo-dock-update.sh
-
 for f in $RPM_BUILD_ROOT%{_datadir}/applications/*desktop
 do
 	desktop-file-validate $f
@@ -434,6 +384,7 @@ done
 
 for f in \
 	LICENSE \
+	copyright \
 	data/ChangeLog.txt \
 %if 0%{?released} < 1
 	doc/HOW-TO__applets.txt \
@@ -447,19 +398,6 @@ done
 %find_lang %{name}
 %{__mv} -f %{name}.lang $TOPDIR
 
-# B. themes
-%if %{build_themes}
-cd ../themes
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	INSTALL="%{__install} -p"
-
-# clean up
-pushd $RPM_BUILD_ROOT%{_datadir}/%{name}/themes
-# no...
-%{__rm} -rf ./_Ubuntu_/
-popd # from $RPM_BUILD_ROOT
-%endif
 
 # C plug-ins
 %{__rm} -rf $TOPDIR/{lang-plug-ins,lang-webkit}
@@ -470,6 +408,9 @@ cd ../plug-ins
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL="%{__install} -p"
+
+%find_lang %{name}-plugins
+cp -p %{name}-plugins.lang $TOPDIR/lang-plug-ins/
 
 Subdirs=$(cat Subdirs.list)
 for dir in */
@@ -518,10 +459,6 @@ do
 	esac
 	cd ..
 done
-
-# Temporary hack
-find $RPM_BUILD_ROOT%{_libdir}/cairo-dock/ -name \*.so | xargs %{__chmod} 0755
-find $RPM_BUILD_ROOT%{_libdir}/cairo-dock -name \*.so.* | xargs %{__rm} -f
 
 # documents
 %if 0%{?released} < 1
@@ -595,12 +532,6 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 # only directory
 %dir	%{_libdir}/%{name}/
 
-%if %{build_themes}
-%files	themes
-%defattr(-,root,root,-)
-%{_datadir}/%{name}/themes/_[A-Z]*/
-%endif
-
 %files	plug-ins -f lang-plug-ins.lang
 %defattr(-,root,root,-)
 %{_libdir}/%{name}/*
@@ -634,6 +565,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Oct 10 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.0-1
+- 2.1.0
+
 * Wed Sep 30 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.0.8.2-1
 - 2.0.8.2
 
