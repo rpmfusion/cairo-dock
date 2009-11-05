@@ -11,8 +11,10 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		mainver		2.1.0
-%undefine		betaver		
+%global		urlver		2.1
+%global		mainver	2.1.1
+%undefine		betaver
+%global		postver	2
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -28,7 +30,7 @@
 
 
 Name:		cairo-dock
-Version:	%{mainver}
+Version:	%{mainver}%{?postver:.%postver}
 Release:	%{fedora_rel}%{?dist}
 Summary:	Light eye-candy fully themable animated dock
 
@@ -38,8 +40,8 @@ URL:		http://www.cairo-dock.org/
 %if 0%{?released} < 1
 Source0:	%{name}-sources-%{betaver}.tar.bz2
 %else
-Source0:	http://launchpad.net/cairo-dock-core/2.1/2.1.0/+download/cairo-dock-%{mainver}%{?betaver:-%betaver}.tar.gz
-Source2:	http://launchpad.net/cairo-dock-plug-ins/2.1/2.1.0/+download/cairo-dock-plugins-%{mainver}%{?betaver:-%betaver}.tar.gz
+Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}/+download/cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
+Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}/+download/cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
 %endif
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -160,8 +162,8 @@ files for developing applications that use %{name}.
 
 ###
 %setup -q -c -a 2
-%{__ln_s} -f cairo-dock-%{mainver}%{?betaver:-%betaver} cairo-dock
-%{__ln_s} -f cairo-dock-plugins-%{mainver}%{?betaver:-%betaver} plug-ins
+%{__ln_s} -f cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} cairo-dock
+%{__ln_s} -f cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} plug-ins
 %endif
 ###
 
@@ -209,8 +211,6 @@ cd ../plug-ins
 find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
-
-# Scooby-Do: see below
 
 # stacks: directory fix
 %if 0%{?released} < 1
@@ -310,19 +310,12 @@ cd ../plug-ins
 # First deal with subdirs in topdir configure.ac, then else
 %configure \
 	--enable-gio-in-gmenu \
-	--enable-mail \
 	--enable-network-monitor \
 	--enable-scooby-do \
 
 
 # Workaround to avoid endless loop on po/
 touch po/stamp-it
-
-# Scooby-Do: workaround
-cd Scooby-Do
-touch config.status
-ln -sf ../libtool
-cd ..
 
 # Parallel make fails some times, but it is gerenally fast
 # so do parallel make anyway first
@@ -383,6 +376,7 @@ done
 %{__mkdir} -p $TOPDIR/documents/main
 
 for f in \
+	ChangeLog \
 	LICENSE \
 	copyright \
 	data/ChangeLog.txt \
@@ -461,9 +455,16 @@ do
 done
 
 # documents
+rm -rf $TOPDIR/documents/plug-ins/
+mkdir -p $TOPDIR/documents/plug-ins/
+
 %if 0%{?released} < 1
-%{__cp} -p Applets.stable $TOPDIR/documents/main/
+%{__cp} -p Applets.stable $TOPDIR/documents/plug-ins/
 %endif
+%{__install} -cpm 0644 \
+	LICENSE \
+	copyright \
+	$TOPDIR/documents/plug-ins/
 
 # lang files
 find $TOPDIR/lang-plug-ins/ -name '*.lang' | xargs cat > $TOPDIR/lang-plug-ins.lang
@@ -534,6 +535,8 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 
 %files	plug-ins -f lang-plug-ins.lang
 %defattr(-,root,root,-)
+%doc	documents/plug-ins/*
+
 %{_libdir}/%{name}/*
 %{_datadir}/%{name}/plug-ins/*
 %if %{build_webkit} > 0
@@ -565,6 +568,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Nov  6 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.1.2-1
+- 2.1.1-2
+
 * Sat Oct 10 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.0-1
 - 2.1.0
 
