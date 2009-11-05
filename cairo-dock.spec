@@ -456,14 +456,14 @@ done
 
 # documents
 rm -rf $TOPDIR/documents/plug-ins/
-mkdir -p $TOPDIR/documentes/plug-ins/
+mkdir -p $TOPDIR/documents/plug-ins/
 
 %if 0%{?released} < 1
 %{__cp} -p Applets.stable $TOPDIR/documents/plug-ins/
 %endif
 %{__install} -cpm 0644 \
 	LICENSE \
-	copying \
+	copyright \
 	$TOPDIR/documents/plug-ins/
 
 # lang files
