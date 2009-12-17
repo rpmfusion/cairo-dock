@@ -1,10 +1,15 @@
 # NOTE!
 # Now for weblet plug-ins now cairo-dock uses WebKit, not Gecko.
 
-# For svn
-# svn checkout http://svn.berlios.de/svnroot/repos/cairo-dock/trunk
-# cd trunk
-# tar cjf ../cairo-dock-sources-%%{tag}.tar.bz2 .
+# Now upstream VCS uses bazaar
+# To gain the source codes from upstream VCS, use
+# $ bzr branch <URL>
+# , where the current URL is:
+#
+# For core:
+# http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-core/2.1.x/
+# For plug-ins:
+# http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-plug-ins/2.1.x/
 
 %global		released	1
 %undefine		pre_release	
@@ -12,9 +17,9 @@
 %global		build_other	1
 
 %global		urlver		2.1
-%global		mainver	2.1.1
+%global		mainver	2.1.2
 %undefine		betaver
-%global		postver	2
+%global		postver	4
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -43,15 +48,20 @@ Source0:	%{name}-sources-%{betaver}.tar.bz2
 Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}/+download/cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
 Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}/+download/cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
 %endif
+# Temporarily
+# pulled from plug-ins 2.1.x branch rev 1449
+Source10:	cairo-dock-plugins-2.1.2.4-missingfiles.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
+Patch101:	cairo-dock-plugins-2.1.2.4-showDesklets.patch
 
-%if ! %{released}
+# For patch101
+#%%if ! %{released}
 BuildRequires:	automake
 BuildRequires:	libtool
-%endif
+#%%endif
 BuildRequires:	desktop-file-utils
 BuildRequires:	gettext
 BuildRequires:	intltool
@@ -167,6 +177,13 @@ files for developing applications that use %{name}.
 %endif
 ###
 
+###
+# Temporarily
+cd plug-ins
+gzip -dc %{SOURCE10} | tar xf -
+cd ..
+###
+
 %if 0
 find . -type d -name \.svn | sort -r | xargs %{__rm} -rf
 find . -type d -name \*CVS\* | sort -r | xargs %{__rm} -rf
@@ -212,6 +229,9 @@ find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
 
+# showDesklets
+%patch101 -p0 -b .miss
+
 # stacks: directory fix
 %if 0%{?released} < 1
 %patch100 -p0 -b .compile
@@ -224,7 +244,7 @@ find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 
 # First deal with subdirs in configure.ac of topdir, then else
-if [ -f Makefile.am ] ; then
+if [[ -f Makefile.am && (0%{?released} -lt 1) ]] ; then
 	Subdirs_1=$(%{__sed} -n -e '\@SUBDIR@,\@^.*[^\\]$@p' Makefile.am | sed -e 's|\\$||' | tail -n +2)
 	%{__sed} -n -e '\@_dir=@p' Makefile.am > eval.sh
 
@@ -240,6 +260,12 @@ else
 	for ddir in */ ; do echo $ddir >> Subdirs.list ; done
 	%{__sed} -i.1 -e '\@po/@d' Subdirs.list
 fi
+
+## Patch101 needs autotools
+## Call here
+autoreconf -fi
+##
+##
 
 for dir in */
 do
@@ -311,7 +337,9 @@ cd ../plug-ins
 %configure \
 	--enable-gio-in-gmenu \
 	--enable-network-monitor \
+	--enable-rssreader \
 	--enable-scooby-do \
+	--enable-show-desklets
 
 
 # Workaround to avoid endless loop on po/
@@ -568,6 +596,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Dec 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.2.4-1
+- 2.1.2-4
+
 * Sat Nov  6 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.1.2-1
 - 2.1.1-2
 
