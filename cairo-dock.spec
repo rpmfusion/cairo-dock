@@ -85,7 +85,14 @@ BuildRequires:	gnome-menus-devel
 BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
+# Make sure that cairo-dock is rebuilt against new libxklavier
+# (It takes some time for rpmfusion buildsyss to get synced to
+#  fedora buildsys)
+%if 0%{?fedora} >= 13
+BuildRequires:	libxklavier-devel >= 5.0
+%else
 BuildRequires:	libxklavier-devel
+%endif
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
@@ -596,6 +603,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Jan 17 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- Rebuild for libxklavier soname bump
+
 * Fri Dec 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.2.4-1
 - 2.1.2-4
 
