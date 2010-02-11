@@ -17,14 +17,14 @@
 %global		build_other	1
 
 %global		urlver		2.1
-%global		mainver	2.1.2
+%global		mainver	2.1.3
 %undefine		betaver
-%global		postver	4
+%global		postver	2
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -50,14 +50,14 @@ Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}/+download
 %endif
 # Temporarily
 # pulled from plug-ins 2.1.x branch rev 1449
-Source10:	cairo-dock-plugins-2.1.2.4-missingfiles.tar.gz
+#Source10:	cairo-dock-plugins-2.1.2.4-missingfiles.tar.gz
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-Patch101:	cairo-dock-plugins-2.1.2.4-showDesklets.patch
+Patch101:	cairo-dock-2.1.3.2-DSO.patch
 
-# For patch101
+# Patch101 needs autotool
 #%%if ! %{released}
 BuildRequires:	automake
 BuildRequires:	libtool
@@ -85,14 +85,8 @@ BuildRequires:	gnome-menus-devel
 BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
-# Make sure that cairo-dock is rebuilt against new libxklavier
-# (It takes some time for rpmfusion buildsyss to get synced to
-#  fedora buildsys)
-%if 0%{?fedora} >= 13
-BuildRequires:	libxklavier-devel >= 5.0
-%else
 BuildRequires:	libxklavier-devel
-%endif
+BuildRequires:	libXrandr-devel
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
@@ -184,13 +178,6 @@ files for developing applications that use %{name}.
 %endif
 ###
 
-###
-# Temporarily
-cd plug-ins
-gzip -dc %{SOURCE10} | tar xf -
-cd ..
-###
-
 %if 0
 find . -type d -name \.svn | sort -r | xargs %{__rm} -rf
 find . -type d -name \*CVS\* | sort -r | xargs %{__rm} -rf
@@ -202,6 +189,7 @@ pushd .
 cd cairo-dock
 
 # Patch
+%patch101 -p1 -b .dso
 
 # permission
 for dir in */
@@ -220,6 +208,10 @@ done
 autoreconf -i -f
 %endif
 
+# For Patch101
+autoreconf -i -f
+
+
 # desktop file
 %{__sed} -i.icon \
 	-e 's|Icon=\*|Icon=cairo-dock|' \
@@ -235,9 +227,6 @@ cd ../plug-ins
 find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
-
-# showDesklets
-%patch101 -p0 -b .miss
 
 # stacks: directory fix
 %if 0%{?released} < 1
@@ -267,12 +256,6 @@ else
 	for ddir in */ ; do echo $ddir >> Subdirs.list ; done
 	%{__sed} -i.1 -e '\@po/@d' Subdirs.list
 fi
-
-## Patch101 needs autotools
-## Call here
-autoreconf -fi
-##
-##
 
 for dir in */
 do
@@ -344,9 +327,7 @@ cd ../plug-ins
 %configure \
 	--enable-gio-in-gmenu \
 	--enable-network-monitor \
-	--enable-rssreader \
 	--enable-scooby-do \
-	--enable-show-desklets
 
 
 # Workaround to avoid endless loop on po/
@@ -603,8 +584,11 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Feb 12 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.2-1
+- 2.1.3-2
+
 * Sun Jan 17 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
-- Rebuild for libxklavier soname bump
+- F-13: Rebuild for libxklavier soname bump
 
 * Fri Dec 18 2009 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.2.4-1
 - 2.1.2-4
