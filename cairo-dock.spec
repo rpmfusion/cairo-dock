@@ -19,7 +19,7 @@
 %global		urlver		2.1
 %global		mainver	2.1.3
 %undefine		betaver
-%global		postver	2
+%global		postver	3
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -41,7 +41,7 @@ Summary:	Light eye-candy fully themable animated dock
 
 Group:		User Interface/Desktops
 License:	GPLv3+
-URL:		http://www.cairo-dock.org/
+URL:		http://www.glx-dock.org/
 %if 0%{?released} < 1
 Source0:	%{name}-sources-%{betaver}.tar.bz2
 %else
@@ -584,6 +584,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Feb 18 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.3-1
+- 2.1.3-3
+
 * Fri Feb 12 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.2-1
 - 2.1.3-2
 
