@@ -19,7 +19,7 @@
 %global		urlver		2.1
 %global		mainver	2.1.3
 %undefine		betaver
-%global		postver	3
+%global		postver	5
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -55,13 +55,11 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
-Patch101:	cairo-dock-2.1.3.2-DSO.patch
 
-# Patch101 needs autotool
-#%%if ! %{released}
+%if ! %{released}
 BuildRequires:	automake
 BuildRequires:	libtool
-#%%endif
+%endif
 BuildRequires:	desktop-file-utils
 BuildRequires:	gettext
 BuildRequires:	intltool
@@ -189,7 +187,6 @@ pushd .
 cd cairo-dock
 
 # Patch
-%patch101 -p1 -b .dso
 
 # permission
 for dir in */
@@ -207,9 +204,6 @@ done
 
 autoreconf -i -f
 %endif
-
-# For Patch101
-autoreconf -i -f
 
 
 # desktop file
@@ -584,6 +578,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Feb 26 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.5-1
+- 2.1.3-5
+
 * Thu Feb 18 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.3-1
 - 2.1.3-3
 
