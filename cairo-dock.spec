@@ -19,7 +19,7 @@
 %global		urlver		2.1
 %global		mainver	2.1.3
 %undefine		betaver
-%global		postver	5
+%global		postver	6
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -578,6 +578,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Mar  3 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.6-1
+- 2.1.3-6
+
 * Fri Feb 26 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.5-1
 - 2.1.3-5
 
