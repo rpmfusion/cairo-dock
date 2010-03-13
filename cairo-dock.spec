@@ -19,7 +19,7 @@
 %global		urlver		2.1
 %global		mainver	2.1.3
 %undefine		betaver
-%global		postver	6
+%global		postver	7
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -98,10 +98,23 @@ BuildRequires:	Thunar-devel
 # Now using webkit, not gecko
 BuildRequires:	WebKit-gtk-devel
 %endif
+
+# This is a meta package to install cairo-dock-core and
+# cairo-dock-plug-ins
+Requires:	%{name}-core = %{version}-%{release}
+Requires:	%{name}-plug-ins = %{version}-%{release}
+
+%description
+This is a metapackage for installing all default packages
+related to cairo-dock.
+
+%package	core
+Summary:	Core files for %{name}
+Group:		User Interface/Desktops
 # Requires related to commands used internally
 # in cairo-dock
 Requires:	findutils
-Requires:	wget
+Requires:	curl
 Requires:	xterm
 
 # Obsoletes moved to main package
@@ -116,15 +129,17 @@ Obsoletes:	%{name}-plug-ins-xfce < %{version}-%{release}
 # cairo-dock-themes is obsoleted
 Obsoletes:	%{name}-themes < %{version}-%{release}
 
-%description
+%description	core
 An light eye-candy fully themable animated dock for any 
 Linux desktop. It has a family-likeness with OSX dock,
 but with more options.
 
+This is the core package of cairo-dock.
+
 %package	plug-ins
 Summary:	Plug-ins files for %{name}
 Group:		User Interface/Desktops
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-core = %{version}-%{release}
 
 %description	plug-ins
 This package contains plug-ins files for %{name}.
@@ -132,16 +147,25 @@ This package contains plug-ins files for %{name}.
 %package	plug-ins-xfce
 Summary:	Plug-ins files for %{name} related to Xfce
 Group:		User Interface/Desktops
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-core = %{version}-%{release}
 
 %description	plug-ins-xfce
 This package contains plug-ins files for %{name} related
 to Xfce.
 
+%package	plug-ins-kde
+Summary:	Plug-ins files for %{name} related to KDE
+Group:		User Interface/Desktops
+Requires:	%{name}-core = %{version}-%{release}
+
+%description	plug-ins-kde
+This package contains plug-ins files for %{name} related
+to KDE.
+
 %package	plug-ins-webkit
 Summary:	Plug-ins files for %{name} related to Gecko
 Group:		User Interface/Desktops
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-core = %{version}-%{release}
 
 %description	plug-ins-webkit
 This package contains plug-ins files for %{name} related
@@ -151,7 +175,7 @@ to webkit.
 Summary:	Development files for %{name}
 Group:		Development/Libraries
 
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-core = %{version}-%{release}
 Requires:	pkgconfig
 Requires:	dbus-glib-devel
 Requires:	gtk2-devel
@@ -520,7 +544,10 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
-%files -f %{name}.lang
+%files
+%defattr(-,root,root,-)
+
+%files core -f %{name}.lang
 %defattr(-,root,root,-)
 %doc	documents/main/*
 
@@ -557,6 +584,8 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %exclude	%{_libdir}/%{name}/*xfce*
 %exclude	%{_datadir}/%{name}/plug-ins/*xfce*
 %endif
+%exclude	%{_libdir}/%{name}/*kde*
+%exclude	%{_datadir}/%{name}/plug-ins/*kde*
 
 %if %{build_xfce} > 0
 %files	plug-ins-xfce
@@ -564,6 +593,11 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/%{name}/*xfce*
 %{_datadir}/%{name}/plug-ins/*xfce*
 %endif
+
+%files	plug-ins-kde
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/*kde*
+%{_datadir}/%{name}/plug-ins/*kde*
 
 %if %{build_webkit} > 0
 %files	plug-ins-webkit -f lang-webkit.lang
@@ -578,6 +612,14 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Mar 14 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.7-1
+- 2.1.3-7
+- Some packaging changes out of requests from the upstream
+  * rename %%name package to -core, make %%name be a metapkg for
+    pulling -core and -plug-ins
+  * split kde related files from -plug-ins
+- Change R: wget -> curl
+
 * Wed Mar  3 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.6-1
 - 2.1.3-6
 
