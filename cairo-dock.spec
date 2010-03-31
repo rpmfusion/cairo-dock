@@ -24,7 +24,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -245,6 +245,16 @@ cd ../plug-ins
 find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
+
+# Scooby-do & Network-Monitor
+# try to enable these modules (where the original code says
+# these will be enabled from 2.1.4)
+for mod in  \
+	Network-Monitor Scooby-Do
+do
+	sed -i.ver -e 's|2, 1, 4,|2, 1, 3,|' \
+	$mod/src/applet-init.c
+done
 
 # stacks: directory fix
 %if 0%{?released} < 1
@@ -612,6 +622,10 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Apr  1 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.7-2
+- Try to enable Network-Monitor and Scooby-do (while the codes say that
+  this will be enabled from 2.1.4) (bug 578393)
+
 * Sun Mar 14 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.7-1
 - 2.1.3-7
 - Some packaging changes out of requests from the upstream
