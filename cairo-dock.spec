@@ -19,12 +19,12 @@
 %global		urlver		2.1
 %global		mainver	2.1.3
 %undefine		betaver
-%global		postver	7
+%global		postver	8
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -622,6 +622,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Apr  7 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.8-1
+- 2.1.3-8
+
 * Thu Apr  1 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.7-2
 - Try to enable Network-Monitor and Scooby-do (while the codes say that
   this will be enabled from 2.1.4) (bug 578393)
