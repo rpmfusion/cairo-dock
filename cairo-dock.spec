@@ -24,7 +24,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -88,7 +88,8 @@ BuildRequires:	libXrandr-devel
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
-BuildRequires:	libetpan-devel
+# Check if buildroot is actually using new libetpan
+BuildRequires:	libetpan-devel >= 1.0
 # For plug-ins-xfce
 %if %{build_xfce} > 0
 BuildRequires:	Thunar-devel
@@ -622,6 +623,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed May 12 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- rebuild against new libetpan
+
 * Thu Apr 22 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.9-1
 - 2.1.3-9
 
