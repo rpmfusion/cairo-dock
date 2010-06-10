@@ -24,7 +24,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	3
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -55,6 +55,11 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # plug-ins specific patches
 Patch100:	cairo-dock-rev1677-stacks.patch
+#
+# Patch from upstream
+# Lauchpad 526138, rpmfusion 1265
+# GMenu does not handle desktop file exec strings properly
+Patch200:       cairo-dock-plugins-c1524-gmenu-parse-desktop-with-quote.patch
 
 %if ! %{released}
 BuildRequires:	automake
@@ -246,6 +251,9 @@ cd ../plug-ins
 find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
 
 # source code fix
+# Gmenu
+# Upstream patch
+%patch200 -p0 -b .quote
 
 # Scooby-do & Network-Monitor
 # try to enable these modules (where the original code says
@@ -623,6 +631,10 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Jun 11 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.9-3
+- Fix for "GMenu does not handle desktop file exec strings properly"
+  (Lauchpad 526138, rpmfusion 1265)
+
 * Wed May 12 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
 - rebuild against new libetpan
 
