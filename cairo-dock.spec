@@ -36,7 +36,7 @@
 
 Name:		cairo-dock
 Version:	%{mainver}%{?postver:.%postver}
-Release:	%{fedora_rel}%{?dist}
+Release:	%{fedora_rel}%{?dist}.1
 Summary:	Light eye-candy fully themable animated dock
 
 Group:		User Interface/Desktops
@@ -631,6 +631,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Jul  3 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
+- Rebuild against new webkitgtk
+
 * Fri Jun 11 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.1.3.9-3
 - Fix for "GMenu does not handle desktop file exec strings properly"
   (Lauchpad 526138, rpmfusion 1265)
