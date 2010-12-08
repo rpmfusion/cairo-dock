@@ -16,15 +16,15 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		urlver		2.1
-%global		mainver	2.1.3
+%global		urlver		2.2
+%global		mainver	2.2.0
 %undefine		betaver
-%global		postver	9
+%global		postver	4
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	3
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -36,7 +36,7 @@
 
 Name:		cairo-dock
 Version:	%{mainver}%{?postver:.%postver}
-Release:	%{fedora_rel}%{?dist}.1
+Release:	%{fedora_rel}%{?dist}
 Summary:	Light eye-candy fully themable animated dock
 
 Group:		User Interface/Desktops
@@ -48,23 +48,9 @@ Source0:	%{name}-sources-%{betaver}.tar.bz2
 Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}/+download/cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
 Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}/+download/cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
 %endif
-# Temporarily
-# pulled from plug-ins 2.1.x branch rev 1449
-#Source10:	cairo-dock-plugins-2.1.2.4-missingfiles.tar.gz
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
-# plug-ins specific patches
-Patch100:	cairo-dock-rev1677-stacks.patch
-#
-# Patch from upstream
-# Lauchpad 526138, rpmfusion 1265
-# GMenu does not handle desktop file exec strings properly
-Patch200:       cairo-dock-plugins-c1524-gmenu-parse-desktop-with-quote.patch
+BuildRequires:	cmake
 
-%if ! %{released}
-BuildRequires:	automake
-BuildRequires:	libtool
-%endif
 BuildRequires:	desktop-file-utils
 BuildRequires:	gettext
 BuildRequires:	intltool
@@ -74,6 +60,7 @@ BuildRequires:	dbus-glib-devel
 BuildRequires:	glitz-glx-devel
 BuildRequires:	gtk2-devel
 BuildRequires:	gtkglext-devel
+BuildRequires:	libcurl-devel
 BuildRequires:	librsvg2-devel
 BuildRequires:	libXcomposite-devel
 BuildRequires:	libXinerama-devel
@@ -88,6 +75,7 @@ BuildRequires:	gnome-menus-devel
 BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
+BuildRequires:	libical-devel
 BuildRequires:	libxklavier-devel
 BuildRequires:	libXrandr-devel
 BuildRequires:	libXxf86vm-devel
@@ -182,33 +170,19 @@ Summary:	Development files for %{name}
 Group:		Development/Libraries
 
 Requires:	%{name}-core = %{version}-%{release}
-Requires:	pkgconfig
-Requires:	dbus-glib-devel
-Requires:	gtk2-devel
-Requires:	glitz-glx-devel
-Requires:	librsvg2-devel
-Requires:	libxml2-devel
-Requires:	libXtst-devel
 
 %description	devel
 The %{name}-devel package contains libraries, build data, and header
 files for developing applications that use %{name}.
 
 %prep
-%if 0%{released} < 1
-%setup -q -c
-%else
-
-###
 %setup -q -c -a 2
-%{__ln_s} -f cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} cairo-dock
-%{__ln_s} -f cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} plug-ins
-%endif
-###
+ln -s -f cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} cairo-dock
+ln -s -f cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} plug-ins
 
 %if 0
-find . -type d -name \.svn | sort -r | xargs %{__rm} -rf
-find . -type d -name \*CVS\* | sort -r | xargs %{__rm} -rf
+find . -type d -name \.svn | sort -r | xargs rm -rf
+find . -type d -name \*CVS\* | sort -r | xargs rm -rf
 %endif
 
 pushd .
@@ -216,323 +190,172 @@ pushd .
 # A. main
 cd cairo-dock
 
-# Patch
+## Patch
 
-# permission
+## permission
 for dir in */
 do
-	find $dir -type f | xargs %{__chmod} 0644
+	find $dir -type f | xargs chmod 0644
 done
-%{__chmod} 0644 [A-Z]*
+chmod 0644 [A-Z]*
 
-# Makefile issue
-%{__sed} -i.debuglevel -e '/-O3/d' \
-%if 0%{?released} > 0
-	src/Makefile.in
-%else
-	src/Makefile.am
+## cmake issue
+sed -i.debuglevel \
+	-e '\@add_definitions@s|-O3|-O2|' \
+	CMakeLists.txt
+sed -i.libdir \
+	-e '\@set.*libdir@s|lib64|lib\${LIB_SUFFIX}|' \
+	CMakeLists.txt
+sed -i.stat \
+	-e 's|\${MSGFMT_EXECUTABLE}|\${MSGFMT_EXECUTABLE} --statistics|' \
+	po/CMakeLists.txt
 
-autoreconf -i -f
-%endif
-
-
-# desktop file
-%{__sed} -i.icon \
+## desktop file
+sed -i.icon \
 	-e 's|Icon=\*|Icon=cairo-dock|' \
 	data/cairo-dock*.desktop
 
 # C. plug-ins
 cd ../plug-ins
 
-# permission
-%if 0%{?released} < 1
-%{__chmod} 0644 Applets.stable
-%endif
-find . -name \*.h -or -name \*.c | xargs %{__chmod} 0644
-
-# source code fix
-# Gmenu
-# Upstream patch
-%patch200 -p0 -b .quote
-
-# Scooby-do & Network-Monitor
-# try to enable these modules (where the original code says
-# these will be enabled from 2.1.4)
-for mod in  \
-	Network-Monitor Scooby-Do
-do
-	sed -i.ver -e 's|2, 1, 4,|2, 1, 3,|' \
-	$mod/src/applet-init.c
-done
-
-# stacks: directory fix
-%if 0%{?released} < 1
-%patch100 -p0 -b .compile
-%{__sed} -i.dir -e '/stacksdatadir/s|pluginsdir|pluginsdatadir|' \
-	stacks/configure.ac
-%endif
-
-# template: upstream says this is not needed
-%{__rm} -rf template/
-
-
-# First deal with subdirs in configure.ac of topdir, then else
-if [[ -f Makefile.am && (0%{?released} -lt 1) ]] ; then
-	Subdirs_1=$(%{__sed} -n -e '\@SUBDIR@,\@^.*[^\\]$@p' Makefile.am | sed -e 's|\\$||' | tail -n +2)
-	%{__sed} -n -e '\@_dir=@p' Makefile.am > eval.sh
-
-# Now bash 4.0 "source" command does not search for the current
-# directory when executed as "sh" (in posix mode)
-	. ./eval.sh
-	Subdirs=$(eval echo ${Subdirs_1})
-
-# Register Subdirs
-	echo $Subdirs > Subdirs.list
-else
-	rm -f Subdirs.list
-	for ddir in */ ; do echo $ddir >> Subdirs.list ; done
-	%{__sed} -i.1 -e '\@po/@d' Subdirs.list
-fi
-
+## permission
 for dir in */
 do
-	skip=0
-	for ddir in $Subdirs
-	do
-		if [ $dir == ${ddir}/ ] ; then skip=1; fi
-	done
-	for ddir in autom* po translations
-	do
-		if [ $dir == ${ddir}/ ] ; then skip=2 ; fi
-	done
-	if [ $skip == 2 ] ; then continue ; fi
-	cd $dir
-
-	%{__sed} -i.error \
-		-e 's|-O3|-O2|' \
-		-e 's|-Werror\\|\\|' \
-		-e 's|-Werror$||' \
-%if 0%{?released} > 0
-		src/Makefile.in
-%else
-		src/Makefile.am
-%endif
-	if [ $skip == 1 ] ; then 
-		cd ..
-		continue
-	fi
-%if %{build_other} > 0
-	autoreconf -i -f
-%endif
-	cd ..
+	find $dir -type f | xargs chmod 0644
 done
+chmod 0644 [A-Z]*
+chmod 0755 */
 
-%if %{released} < 1
-autoreconf -f -i
-%endif
+## cmake issue
+sed -i.debuglevel \
+	-e '\@add_definitions@s|-O3|-O2|' \
+	CMakeLists.txt
+sed -i.stat \
+	-e 's|\${MSGFMT_EXECUTABLE}|\${MSGFMT_EXECUTABLE} --statistics|' \
+	po/CMakeLists.txt
+
+## source code fix
+
+# template: upstream says this is not needed
+#rm -rf template/
 
 popd # from opt/cairo-dock/trunk/cairo-dock
 
 %build
 status=0
+TOPDIR=$(pwd)
+
 %global	__make	\
-	%{_bindir}/make -k GMSGFMT="%{_bindir}/msgfmt --statistics"
+	%{_bindir}/make -k VERBOSE=true
 
 # A. main
 pushd cairo-dock
 
-# --enable-glitz cannot be set because cairo-glitz.h is missing
-# (Fedora cairo does not support glitz)
-%configure
-
-# Workaround to avoid endless loop on po/
-touch po/stamp-it
-
+## rpath issue needs investigating
+%cmake -DCMAKE_SKIP_RPATH:BOOL=ON .
 %{__make} %{?_smp_mflags} || status=$((status+1))
 
-# For plug-ins & themes
-unlink cairo-dock || :
-ln -sf src cairo-dock
-export CFLAGS="%optflags -I$(pwd) -I$(pwd)/cairo-dock"
-export CPPFLAGS="%optflags -I$(pwd) -I$(pwd)/cairo-dock"
-export PKG_CONFIG_PATH=$(pwd):${PKG_CONFIG_PATH}
+## Once install
+rm -rf TMPINSTDIR
+%{__make} install \
+	DESTDIR=$TOPDIR/TMPINSTDIR \
+	INSTALL="install -p" \
+	|| status=$((status+1))
+
+export CFLAGS="%optflags -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock"
+export CFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/cairo-dock"
+export CFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/icon-factory"
+export CXXFLAGS="%optflags -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock"
+export CXXFLAGS="$CXXFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/cairo-dock"
+export CXXFLAGS="$CXXFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/icon-factory"
+export LD_LIBRARY_PATH=$TOPDIR/TMPINSTDIR%{_libdir}
+export PKG_CONFIG_PATH=$TOPDIR/TMPINSTDIR%{_libdir}/pkgconfig:${PKG_CONFIG_PATH}
+
+chmod 0755 $TOPDIR/TMPINSTDIR%{_libdir}/lib*.so.*
 
 # C plug-ins
 cd ../plug-ins
 
-# First deal with subdirs in topdir configure.ac, then else
-%configure \
-	--enable-gio-in-gmenu \
-	--enable-network-monitor \
-	--enable-scooby-do \
+%cmake .
 
-
-# Workaround to avoid endless loop on po/
-touch po/stamp-it
-
-# Parallel make fails some times, but it is gerenally fast
-# so do parallel make anyway first
+## Parallel make fails some times, but it is gerenally fast
+## so do parallel make anyway first
 retry=0
 %{__make} %{?_smp_mflags} || retry=1
 if [ $retry == 1 ] ; then
 	%{__make} || status=$((status+1))
 fi
 
-%if %{build_other} >= 1
-Subdirs=$(cat Subdirs.list)
-for dir in */
-do
-	unset CONFIGURE_OPTS
-	skip=0
-	for ddir in $Subdirs autom* po translations
-		do
-		if [ $dir == ${ddir}/ ] ; then skip=1 ; fi
-	done
-	if [ $skip == 1 ] ; then continue ; fi
-	cd $dir
+%{__make} install \
+	DESTDIR=$TOPDIR/TMPINSTDIR \
+	INSTALL="install -p" \
+	|| status=$((status+1))
 
-	%configure $CONFIGURE_OPTS
-	# Parallel make fails some times, but it is gerenally fast
-	# so do parallel make anyway first
-	%{__make} %{?_smp_mflags} || :
-	%{__make} || status=$((status+1))
+popd ## from opt/cairo-dock/trunk/cairo-dock
 
-	cd ..
-done
-%endif
-
-popd # from opt/cairo-dock/trunk/cairo-dock
+## exit abnormally if some failure occurred 
 if [ $status -gt 0 ] ; then exit 1 ; fi
 
 %install
-%{__rm} -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT
 TOPDIR=$(pwd)
 
-# A. main
-pushd cairo-dock
-export PKG_CONFIG_PATH=$(pwd):${PKG_CONFIG_PATH}
+# First copy all
+cp -a ./TMPINSTDIR/* $RPM_BUILD_ROOT/
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	INSTALL="%{__install} -p"
-
+# Main package handling
+## Desktop files
 for f in $RPM_BUILD_ROOT%{_datadir}/applications/*desktop
 do
 	desktop-file-validate $f
 done
-%{__mkdir_p} $RPM_BUILD_ROOT%{_datadir}/pixmaps
-%{__install} -cpm 644 data/%{name}.svg \
-	$RPM_BUILD_ROOT%{_datadir}/pixmaps/
 
-# documents
-%{__rm} -rf $TOPDIR/documents/main
-%{__mkdir} -p $TOPDIR/documents/main
+## Cleanups
+rm -f $RPM_BUILD_ROOT%{_datadir}/%{name}/ChangeLog.txt
 
-for f in \
+## gettext .mo
+%find_lang %{name}
+
+## documents
+rm -rf $TOPDIR/documents/main
+mkdir -p $TOPDIR/documents/main
+
+pushd cairo-dock
+install -cpm 644 \
 	ChangeLog \
+	LGPL-2 \
 	LICENSE \
 	copyright \
 	data/ChangeLog.txt \
-%if 0%{?released} < 1
-	doc/HOW-TO__applets.txt \
-	doc/dox.config \
-%endif
-	
-do
-	%{__cp} -pr $f $TOPDIR/documents/main/
-done
+	$TOPDIR/documents/main/
 
-%find_lang %{name}
-%{__mv} -f %{name}.lang $TOPDIR
+popd # from cairo-dock
 
 
-# C plug-ins
-%{__rm} -rf $TOPDIR/{lang-plug-ins,lang-webkit}
-%{__mkdir} -p $TOPDIR/{lang-plug-ins,lang-webkit}
-
-cd ../plug-ins
-# First deal with subdirs in topdir configure.ac, then else
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT \
-	INSTALL="%{__install} -p"
-
+# plug-ins
+## lang
 %find_lang %{name}-plugins
-cp -p %{name}-plugins.lang $TOPDIR/lang-plug-ins/
-
-Subdirs=$(cat Subdirs.list)
-for dir in */
-do
-	skip=0
-	for ddir in $Subdirs
-		do
-		if [ $dir == ${ddir}/ ] ; then skip=1 ; fi
-	done
-	# don't skip here
-	# if [ $skip == 1 ] ; then continue ; fi
-
-	for ddir in autom* po translations
-		do
-		if [ $dir == ${ddir}/ ] ; then skip=2 ; fi
-	done
-	if [ $skip == 2 ] ; then continue ; fi
-
-	cd $dir
-
-%if %{build_other} >= 1
-	[ $skip != 1 ] && \
-		%{__make} install \
-		DESTDIR=$RPM_BUILD_ROOT \
-		INSTALL="%{__install} -p"
-%endif
-
-	# read GETTEXT_PACKAGE
-	if [ ! -r po/Makefile.in ] ; then
-		cd ..
-		continue
-	fi
-
-	GETTEXT_MO_PACKAGES=`sed -n -e 's|^GETTEXT_PACKAGE *= *||p' po/Makefile.in`
-	case $GETTEXT_MO_PACKAGES in
-		*weblet* )
-			%find_lang $GETTEXT_MO_PACKAGES && \
-				%{__mv} -f ${GETTEXT_MO_PACKAGES}.lang \
-				$TOPDIR/lang-webkit/
-				;;
-		* )
-			%find_lang $GETTEXT_MO_PACKAGES && \
-				%{__mv} -f ${GETTEXT_MO_PACKAGES}.lang \
-				$TOPDIR/lang-plug-ins/
-				;;
-	esac
-	cd ..
-done
 
 # documents
 rm -rf $TOPDIR/documents/plug-ins/
 mkdir -p $TOPDIR/documents/plug-ins/
 
-%if 0%{?released} < 1
-%{__cp} -p Applets.stable $TOPDIR/documents/plug-ins/
-%endif
-%{__install} -cpm 0644 \
+pushd plug-ins
+install -cpm 0644 \
+	ChangeLog \
+	LGPL-2 \
 	LICENSE \
 	copyright \
 	$TOPDIR/documents/plug-ins/
 
-# lang files
-find $TOPDIR/lang-plug-ins/ -name '*.lang' | xargs cat > $TOPDIR/lang-plug-ins.lang
-%if %{build_webkit} > 0
-find $TOPDIR/lang-webkit/ -name '*.lang' | xargs cat > $TOPDIR/lang-webkit.lang
-%endif
+popd # from plug-ins
 
-popd # from opt/cairo-dock/trunk/cairo-dock
-
-# final clean up
-# remove all unneeded files
+# Final clean up
+## remove all unneeded files
 pushd $RPM_BUILD_ROOT
-%{__rm} -f ./%{_datadir}/%{name}/{ChangeLog.txt,License}
-find .%{_libdir}/%{name} -name \*.la | xargs %{__rm} -f
 
+find .%{_libdir}/%{name} -name \*.la | xargs %{__rm} -f
 # just to suppress rpmlint...
 for f in \
 	`find ./%{_datadir}/%{name} -name \*.desktop` \
@@ -541,7 +364,7 @@ for f in \
 	echo > $f.tmp
 	cat $f >> $f.tmp
 	touch -r $f $f.tmp
-	%{__mv} -f $f.tmp $f
+	mv -f $f.tmp $f
 done
 
 set +x
@@ -549,7 +372,7 @@ for f in .%{_datadir}/%{name}/plug-ins/*/*
 	do
 	if head -n 1 $f 2>/dev/null | grep -q /bin/ ; then 
 		set -x
-		%{__chmod} 0755 $f
+		chmod 0755 $f
 		set +x
 	fi
 done
@@ -557,11 +380,10 @@ set -x
 
 popd # from $RPM_BUILD_ROOT
 
-# For now these are not needed
-rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 
-%clean
-%{__rm} -rf $RPM_BUILD_ROOT
+%post core -p /sbin/ldconfig
+%postun core -p /sbin/ldconfig
+
 
 %files
 %defattr(-,root,root,-)
@@ -571,16 +393,19 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %doc	documents/main/*
 
 %{_bindir}/*%{name}*
+%{_libdir}/libgldi.so.2*
 %{_datadir}/applications/%{name}*.desktop
 %{_datadir}/pixmaps/%{name}.svg
 
 %dir	%{_datadir}/%{name}/
 %{_datadir}/%{name}/*.conf
+%{_datadir}/%{name}/*.desktop
 %{_datadir}/%{name}/*.png
 %{_datadir}/%{name}/*.svg
+%{_datadir}/%{name}/*.sh
 %{_datadir}/%{name}/*.xpm
 %{_datadir}/%{name}/*view
-%{_datadir}/%{name}/emblems/
+#%%{_datadir}/%{name}/emblems/
 %{_datadir}/%{name}/explosion/
 %{_datadir}/%{name}/gauges/
 %dir	%{_datadir}/%{name}/themes/
@@ -589,7 +414,9 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 # only directory
 %dir	%{_libdir}/%{name}/
 
-%files	plug-ins -f lang-plug-ins.lang
+%{_mandir}/man1/%{name}.1*
+
+%files	plug-ins -f %{name}-plugins.lang
 %defattr(-,root,root,-)
 %doc	documents/plug-ins/*
 
@@ -619,7 +446,7 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %{_datadir}/%{name}/plug-ins/*kde*
 
 %if %{build_webkit} > 0
-%files	plug-ins-webkit -f lang-webkit.lang
+%files	plug-ins-webkit
 %defattr(-,root,root,-)
 %{_libdir}/%{name}/*weblet*
 %{_datadir}/%{name}/plug-ins/*weblet*
@@ -628,9 +455,13 @@ rm -f %{buildroot}%{_libdir}/libcairo-dock.*
 %files	devel
 %defattr(-,root,root,-)
 %{_includedir}/%{name}/
+%{_libdir}/libgldi.so
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Thu Dec  9 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.2.0.4-1
+- 2.2.0-4
+
 * Sat Jul  3 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp>
 - Rebuild against new webkitgtk
 
