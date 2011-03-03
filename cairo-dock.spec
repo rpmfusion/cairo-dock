@@ -12,14 +12,14 @@
 # http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-plug-ins/2.1.x/
 
 %global		released	1
-%undefine		pre_release	
+%define		pre_release	1
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		urlver		2.2
-%global		mainver	2.2.0
-%undefine		betaver
-%global		postver	4
+%global		urlver		2.3
+%global		mainver	2.3.0
+%define		betaver	0rc1
+%undefine		postver	
 
 %global		build_webkit	1
 %global		build_xfce	1
@@ -33,6 +33,19 @@
 %global		build_other	0
 %endif
 
+# Bindings
+%global	build_python		1
+%{!?python_sitelib:	%global	python_sitelib	%(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+
+%global	build_ruby		0
+%global	rubyabi		1.8
+%global	ruby_sitearch		%(ruby -rrbconfig -e "puts Config::CONFIG['sitearchdir']")
+# FIXME
+# I don't know well about vala !!
+%global	build_vala		0
+
+# For debugging
+%global	skip_main_build	0
 
 Name:		cairo-dock
 Version:	%{mainver}%{?postver:.%postver}
@@ -45,8 +58,8 @@ URL:		http://www.glx-dock.org/
 %if 0%{?released} < 1
 Source0:	%{name}-sources-%{betaver}.tar.bz2
 %else
-Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}/+download/cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
-Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}/+download/cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver}.tar.gz
+Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:~%betaver}.tar.gz
+Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:~%betaver}.tar.gz
 %endif
 
 BuildRequires:	cmake
@@ -91,6 +104,20 @@ BuildRequires:	Thunar-devel
 # For plug-ins-webkit
 # Now using webkit, not gecko
 BuildRequires:	WebKit-gtk-devel
+%endif
+
+# Bindings
+%if %{build_python}
+BuildRequires:	python2-devel
+%endif
+%if %{build_ruby}
+BuildRequires:	ruby(abi) = %{rubyabi}
+BuildRequires:	ruby
+BuildRequires:	ruby-devel
+%endif
+%if %{build_vala}
+#?????
+# BuildRequires:	vala
 %endif
 
 # This is a meta package to install cairo-dock-core and
@@ -165,6 +192,38 @@ Requires:	%{name}-core = %{version}-%{release}
 This package contains plug-ins files for %{name} related
 to webkit.
 
+%package	python
+Summary:	Python binding for %{name}
+Group:		User Interface/Desktops
+Requires:	%{name} = %{version}-%{release}
+Requires:	pygobject2
+Requires:	dbus-python
+
+%description	python
+This package contains Python binding files for %{name}
+
+%package	ruby
+Summary:	Ruby binding for %{name}
+Group:		User Interface/Desktops
+Requires:	%{name} = %{version}-%{release}
+Requires:	ruby(abi) = %{rubyabi}
+Requires:	rubygems
+# The following is not in Fedora yet
+Requires:	rubygem(dbus)
+
+%description	ruby
+This package contains Ruby binding files for %{name}
+
+%package	vala
+Summary:	Vala binding for %{name}
+Group:		User Interface/Desktops
+Requires:	%{name} = %{version}-%{release}
+# ???
+Requires:	vala
+
+%description	vala
+This package contains Vala binding files for %{name}
+
 %package	devel
 Summary:	Development files for %{name}
 Group:		Development/Libraries
@@ -177,14 +236,15 @@ files for developing applications that use %{name}.
 
 %prep
 %setup -q -c -a 2
-ln -s -f cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} cairo-dock
-ln -s -f cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:-%betaver} plug-ins
+ln -s -f cairo-dock-%{mainver}* cairo-dock
+ln -s -f cairo-dock-plugins-%{mainver}* plug-ins
 
 %if 0
 find . -type d -name \.svn | sort -r | xargs rm -rf
 find . -type d -name \*CVS\* | sort -r | xargs rm -rf
 %endif
 
+TOPDIR=$(pwd)
 pushd .
 
 # A. main
@@ -235,9 +295,22 @@ sed -i.stat \
 	po/CMakeLists.txt
 
 ## source code fix
-
-# template: upstream says this is not needed
-#rm -rf template/
+## Bindings
+# Ruby
+sed -i.site \
+	-e "s|CONFIG\['rubylibdir'\]|CONFIG['sitearchdir']|" \
+	CMakeLists.txt
+# Python
+## FIXME
+sed -i.buildroot \
+	-e "s|--prefix=\\\${CMAKE_INSTALL_PREFIX}|--prefix=$TOPDIR/TMPINSTDIR/\\\${CMAKE_INSTALL_PREFIX}|" \
+	Dbus/interfaces/python/PythonInstall.cmake.in \
+	Dbus/interfaces/bash/BashInstall.cmake.in
+# Vala
+## FIXME
+sed -i.vala \
+	-e '/with_vala /s|yes|no|' \
+	CMakeLists.txt
 
 popd # from opt/cairo-dock/trunk/cairo-dock
 
@@ -251,6 +324,8 @@ TOPDIR=$(pwd)
 # A. main
 pushd cairo-dock
 
+%if %{skip_main_build} < 1
+
 ## rpath issue needs investigating
 %cmake -DCMAKE_SKIP_RPATH:BOOL=ON .
 %{__make} %{?_smp_mflags} || status=$((status+1))
@@ -261,6 +336,8 @@ rm -rf TMPINSTDIR
 	DESTDIR=$TOPDIR/TMPINSTDIR \
 	INSTALL="install -p" \
 	|| status=$((status+1))
+
+%endif
 
 export CFLAGS="%optflags -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock"
 export CFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/cairo-dock"
@@ -276,7 +353,20 @@ chmod 0755 $TOPDIR/TMPINSTDIR%{_libdir}/lib*.so.*
 # C plug-ins
 cd ../plug-ins
 
-%cmake .
+# Create pseudo executable files
+test -d TMPBINDIR || mkdir TMPBINDIR
+export PATH=$(pwd)/TMPBINDIR:$PATH
+
+cd TMPBINDIR
+# Ruby: not ready
+%if %{build_ruby} < 1
+ln -sf /bin/false ruby
+%endif
+cd ..
+
+rm -f CMakeCache.txt
+%cmake \
+	.
 
 ## Parallel make fails some times, but it is gerenally fast
 ## so do parallel make anyway first
@@ -408,6 +498,7 @@ popd # from $RPM_BUILD_ROOT
 #%%{_datadir}/%{name}/emblems/
 %{_datadir}/%{name}/explosion/
 %{_datadir}/%{name}/gauges/
+%{_datadir}/%{name}/icons/
 %dir	%{_datadir}/%{name}/themes/
 %dir	%{_datadir}/%{name}/plug-ins/
 %{_datadir}/%{name}/themes/_default_/
@@ -452,6 +543,20 @@ popd # from $RPM_BUILD_ROOT
 %{_datadir}/%{name}/plug-ins/*weblet*
 %endif
 
+%if %{build_python} > 0
+%files	python
+%defattr(-,root,root,-)
+%{python_sitelib}/CDApplet.py*
+%{python_sitelib}/CDBashApplet.py*
+%{python_sitelib}/*.egg-info
+%endif
+
+%if %{build_ruby} > 0
+%files	ruby
+%defattr(-,root,root,-)
+%{ruby_sitearch}/CDApplet.rb
+%endif
+
 %files	devel
 %defattr(-,root,root,-)
 %{_includedir}/%{name}/
@@ -459,6 +564,10 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Mar  4 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0-0.1.0rc1
+- 2.3.0 0rc1
+- Dbus interface: enable python, disable python, disable vala for now
+
 * Thu Dec  9 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.2.0.4-1
 - 2.2.0-4
 
