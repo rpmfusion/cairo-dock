@@ -12,19 +12,19 @@
 # http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-plug-ins/2.1.x/
 
 %global		released	1
-%define		pre_release	1
+%undefine		pre_release	
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
 %global		urlver		2.3
 %global		mainver	2.3.0
-%define		betaver	0rc1
-%undefine		postver	
+#%%define		betaver	0rc1
+%define		postver	2
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -58,8 +58,8 @@ URL:		http://www.glx-dock.org/
 %if 0%{?released} < 1
 Source0:	%{name}-sources-%{betaver}.tar.bz2
 %else
-Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver:-%postver}%{?betaver:~%betaver}.tar.gz
-Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver:-%postver}%{?betaver:~%betaver}.tar.gz
+Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver:~%postver}%{?betaver:~%betaver}.tar.gz
+Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver:~%postver}%{?betaver:~%betaver}.tar.gz
 %endif
 
 BuildRequires:	cmake
@@ -92,6 +92,7 @@ BuildRequires:	libical-devel
 BuildRequires:	libxklavier-devel
 BuildRequires:	libXrandr-devel
 BuildRequires:	libXxf86vm-devel
+BuildRequires:	libzeitgeist-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
 BuildRequires:	libetpan-devel
@@ -564,6 +565,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue May  3 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0.2-1
+- 2.3.0~2
+
 * Sat Mar  5 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0-0.2.0rc1
 - Add BR: lm_sensors-devel for Sensors support
 
