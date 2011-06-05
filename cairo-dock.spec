@@ -19,12 +19,17 @@
 %global		urlver		2.3
 %global		mainver	2.3.0
 #%%define		betaver	0rc1
-%define		postver	2
+%global		postver_c	2.1
+%global		postver_p	2
+
+%global		rpmver_c	%{mainver}%{?postver_c:.%postver_c}
+%global		rpmver_p	%{mainver}%{?postver_p:.%postver_p}
+%global		rpmrel		%{fedora_rel}%{?dist}
 
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	1.2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -48,8 +53,8 @@
 %global	skip_main_build	0
 
 Name:		cairo-dock
-Version:	%{mainver}%{?postver:.%postver}
-Release:	%{fedora_rel}%{?dist}
+Version:	%{rpmver_c}
+Release:	%{rpmrel}
 Summary:	Light eye-candy fully themable animated dock
 
 Group:		User Interface/Desktops
@@ -58,8 +63,8 @@ URL:		http://www.glx-dock.org/
 %if 0%{?released} < 1
 Source0:	%{name}-sources-%{betaver}.tar.bz2
 %else
-Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver:~%postver}%{?betaver:~%betaver}.tar.gz
-Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver:~%postver}%{?betaver:~%betaver}.tar.gz
+Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver_c:~%postver_c}%{?betaver:~%betaver}.tar.gz
+Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver_p:~%postver_p}%{?betaver:~%betaver}.tar.gz
 %endif
 
 BuildRequires:	cmake
@@ -123,8 +128,8 @@ BuildRequires:	ruby-devel
 
 # This is a meta package to install cairo-dock-core and
 # cairo-dock-plug-ins
-Requires:	%{name}-core = %{version}-%{release}
-Requires:	%{name}-plug-ins = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-plug-ins = %{rpmver_p}-%{rpmrel}
 
 %description
 This is a metapackage for installing all default packages
@@ -132,6 +137,8 @@ related to cairo-dock.
 
 %package	core
 Summary:	Core files for %{name}
+Version:	%{rpmver_c}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 # Requires related to commands used internally
 # in cairo-dock
@@ -141,15 +148,15 @@ Requires:	xterm
 
 # Obsoletes moved to main package
 # Switch to Webkit, always obsolete gecko (and _not_ provide it)
-Obsoletes:	%{name}-plug-ins-gecko < %{version}-%{release}
+Obsoletes:	%{name}-plug-ins-gecko < %{rpmver_p}-%{rpmrel}
 %if %{build_webkit} == 0
-Obsoletes:	%{name}-plug-ins-webkit < %{version}-%{release}
+Obsoletes:	%{name}-plug-ins-webkit < %{rpmver_p}-%{rpmrel}
 %endif
 %if %{build_xfce} == 0
-Obsoletes:	%{name}-plug-ins-xfce < %{version}-%{release}
+Obsoletes:	%{name}-plug-ins-xfce < %{rpmver_p}-%{rpmrel}
 %endif
 # cairo-dock-themes is obsoleted
-Obsoletes:	%{name}-themes < %{version}-%{release}
+Obsoletes:	%{name}-themes < %{rpmver_c}-%{rpmrel}
 
 %description	core
 An light eye-candy fully themable animated dock for any 
@@ -160,16 +167,20 @@ This is the core package of cairo-dock.
 
 %package	plug-ins
 Summary:	Plug-ins files for %{name}
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
 %description	plug-ins
 This package contains plug-ins files for %{name}.
 
 %package	plug-ins-xfce
 Summary:	Plug-ins files for %{name} related to Xfce
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
 %description	plug-ins-xfce
 This package contains plug-ins files for %{name} related
@@ -177,8 +188,10 @@ to Xfce.
 
 %package	plug-ins-kde
 Summary:	Plug-ins files for %{name} related to KDE
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
 %description	plug-ins-kde
 This package contains plug-ins files for %{name} related
@@ -186,8 +199,10 @@ to KDE.
 
 %package	plug-ins-webkit
 Summary:	Plug-ins files for %{name} related to Gecko
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
 %description	plug-ins-webkit
 This package contains plug-ins files for %{name} related
@@ -195,8 +210,10 @@ to webkit.
 
 %package	python
 Summary:	Python binding for %{name}
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 Requires:	pygobject2
 Requires:	dbus-python
 
@@ -205,8 +222,10 @@ This package contains Python binding files for %{name}
 
 %package	ruby
 Summary:	Ruby binding for %{name}
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 Requires:	ruby(abi) = %{rubyabi}
 Requires:	rubygems
 # The following is not in Fedora yet
@@ -217,8 +236,10 @@ This package contains Ruby binding files for %{name}
 
 %package	vala
 Summary:	Vala binding for %{name}
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 # ???
 Requires:	vala
 
@@ -227,9 +248,11 @@ This package contains Vala binding files for %{name}
 
 %package	devel
 Summary:	Development files for %{name}
+Version:	%{rpmver_c}
+Release:	%{rpmrel}
 Group:		Development/Libraries
 
-Requires:	%{name}-core = %{version}-%{release}
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
 %description	devel
 The %{name}-devel package contains libraries, build data, and header
@@ -565,6 +588,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Jun  5 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0.2.1-2
+- core 2.3.0~2.1
+
 * Tue May  3 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0.2-1
 - 2.3.0~2
 
