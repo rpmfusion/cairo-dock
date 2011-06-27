@@ -19,8 +19,8 @@
 %global		urlver		2.3
 %global		mainver	2.3.0
 #%%define		betaver	0rc1
-%global		postver_c	2.1
-%global		postver_p	2
+%global		postver_c	3
+%global		postver_p	3
 
 %global		rpmver_c	%{mainver}%{?postver_c:.%postver_c}
 %global		rpmver_p	%{mainver}%{?postver_p:.%postver_p}
@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -588,6 +588,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Tue Jun 28 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0.3-1
+- 2.3.0-3
+
 * Sun Jun  5 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0.2.1-2
 - core 2.3.0~2.1
 
