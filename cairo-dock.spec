@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -100,7 +100,9 @@ BuildRequires:	libXxf86vm-devel
 BuildRequires:	libzeitgeist-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
-BuildRequires:	libetpan-devel
+# Make it sure that cairo-dock is rebuilt against
+# newer libetpan
+BuildRequires:	libetpan-devel >= 1.1
 BuildRequires:	lm_sensors-devel
 # For plug-ins-xfce
 %if %{build_xfce} > 0
@@ -588,6 +590,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Jul 24 2011 Mamoru Tasaka <mtasaka@fedoraproject.org>
+- Rebuild against new libetpan
+
 * Tue Jun 28 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.3.0.3-1
 - 2.3.0-3
 
