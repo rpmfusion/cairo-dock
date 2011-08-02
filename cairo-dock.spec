@@ -24,7 +24,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -82,7 +82,7 @@ BuildRequires:	libXxf86vm-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
 # Check if buildroot is actually using new libetpan
-BuildRequires:	libetpan-devel >= 1.0
+BuildRequires:	libetpan-devel >= 1.1
 # For plug-ins-xfce
 %if %{build_xfce} > 0
 BuildRequires:	Thunar-devel
@@ -459,6 +459,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Wed Aug  3 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.2.0.4-2
+- Rebuild against new libetpan
+
 * Thu Dec  9 2010 Mamoru Tasaka <mtasaka@ioa.s.u-tokyo.ac.jp> - 2.2.0.4-1
 - 2.2.0-4
 
