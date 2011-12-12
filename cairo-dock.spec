@@ -16,11 +16,11 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		urlver		2.3
-%global		mainver	2.3.0
+%global		urlver		2.4
+%global		mainver	2.4.0
 #%%define		betaver	0rc1
-%global		postver_c	3
-%global		postver_p	3
+%global		postver_c	2
+%global		postver_p	2
 
 %global		rpmver_c	%{mainver}%{?postver_c:.%postver_c}
 %global		rpmver_p	%{mainver}%{?postver_p:.%postver_p}
@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	3
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -89,7 +89,11 @@ BuildRequires:	perl(XML::Parser)
 
 # For plug-ins
 BuildRequires:	alsa-lib-devel
+BuildRequires:	fftw3-devel
+%if 0%{?fedora} < 16
+# This is gnome2
 BuildRequires:	gnome-menus-devel
+%endif
 BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
 BuildRequires:	libgnomeui-devel
@@ -98,6 +102,9 @@ BuildRequires:	libxklavier-devel
 BuildRequires:	libXrandr-devel
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	libzeitgeist-devel
+BuildRequires:	pulseaudio-libs-devel
+#BuildRequires:	qt4-devel
+BuildRequires:	upower-devel
 BuildRequires:	vte-devel
 # Not shown in .pc files
 # Make it sure that cairo-dock is rebuilt against
@@ -352,6 +359,18 @@ pushd cairo-dock
 
 %if %{skip_main_build} < 1
 
+# ZZZ GLib inclusion
+# From GLib 2.31, _some_ Glib headers were made not to be included
+# directly, however still gi18n.h, gstdio.h and so on have to be
+# included separately
+%if 0%{?fedora} >= 17
+export CFLAGS="%optflags -DGLIB_COMPILATION"
+export CXXFLAGS="%optflags -DGLIB_COMPILATION"
+%else
+export CFLAGS="%optflags"
+export CXXFLAGS="%optflags"
+%endif
+
 ## rpath issue needs investigating
 %cmake -DCMAKE_SKIP_RPATH:BOOL=ON .
 %{__make} %{?_smp_mflags} || status=$((status+1))
@@ -365,12 +384,16 @@ rm -rf TMPINSTDIR
 
 %endif
 
-export CFLAGS="%optflags -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock"
+%if 1
+export CFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock"
 export CFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/cairo-dock"
 export CFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/icon-factory"
-export CXXFLAGS="%optflags -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock"
+export CFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/gldit"
+export CXXFLAGS="$CFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock"
 export CXXFLAGS="$CXXFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/cairo-dock"
 export CXXFLAGS="$CXXFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/icon-factory"
+export CXXFLAGS="$CXXFLAGS -I$TOPDIR/TMPINSTDIR%{_includedir}/cairo-dock/gldit"
+%endif
 export LD_LIBRARY_PATH=$TOPDIR/TMPINSTDIR%{_libdir}
 export PKG_CONFIG_PATH=$TOPDIR/TMPINSTDIR%{_libdir}/pkgconfig:${PKG_CONFIG_PATH}
 
@@ -516,15 +539,14 @@ popd # from $RPM_BUILD_ROOT
 %dir	%{_datadir}/%{name}/
 %{_datadir}/%{name}/*.conf
 %{_datadir}/%{name}/*.desktop
-%{_datadir}/%{name}/*.png
 %{_datadir}/%{name}/*.svg
-%{_datadir}/%{name}/*.sh
-%{_datadir}/%{name}/*.xpm
+%{_datadir}/%{name}/images/
 %{_datadir}/%{name}/*view
 #%%{_datadir}/%{name}/emblems/
 %{_datadir}/%{name}/explosion/
 %{_datadir}/%{name}/gauges/
 %{_datadir}/%{name}/icons/
+%{_datadir}/%{name}/scripts/
 %dir	%{_datadir}/%{name}/themes/
 %dir	%{_datadir}/%{name}/plug-ins/
 %{_datadir}/%{name}/themes/_default_/
@@ -572,6 +594,7 @@ popd # from $RPM_BUILD_ROOT
 %if %{build_python} > 0
 %files	python
 %defattr(-,root,root,-)
+%{python_sitelib}/CairoDock.py*
 %{python_sitelib}/CDApplet.py*
 %{python_sitelib}/CDBashApplet.py*
 %{python_sitelib}/*.egg-info
@@ -590,6 +613,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Dec 12 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.4.0.2-1
+- 2.3.4-2
+
 * Tue Nov  8 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.3.0.3-3
 - Rebuilt
 
