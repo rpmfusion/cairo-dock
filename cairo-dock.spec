@@ -614,7 +614,7 @@ popd # from $RPM_BUILD_ROOT
 
 %changelog
 * Mon Dec 12 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.4.0.2-1
-- 2.3.4-2
+- 2.4.0-2
 
 * Tue Nov  8 2011 Nicolas Chauvet <kwizart@gmail.com> - 2.3.0.3-3
 - Rebuilt
