@@ -54,7 +54,7 @@
 
 Name:		cairo-dock
 Version:	%{rpmver_c}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Summary:	Light eye-candy fully themable animated dock
 
 Group:		User Interface/Desktops
@@ -147,7 +147,7 @@ related to cairo-dock.
 %package	core
 Summary:	Core files for %{name}
 Version:	%{rpmver_c}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 # Requires related to commands used internally
 # in cairo-dock
@@ -177,7 +177,7 @@ This is the core package of cairo-dock.
 %package	plug-ins
 Summary:	Plug-ins files for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -187,7 +187,7 @@ This package contains plug-ins files for %{name}.
 %package	plug-ins-xfce
 Summary:	Plug-ins files for %{name} related to Xfce
 Version:	%{rpmver_p}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -198,7 +198,7 @@ to Xfce.
 %package	plug-ins-kde
 Summary:	Plug-ins files for %{name} related to KDE
 Version:	%{rpmver_p}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -209,7 +209,7 @@ to KDE.
 %package	plug-ins-webkit
 Summary:	Plug-ins files for %{name} related to Gecko
 Version:	%{rpmver_p}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -220,7 +220,7 @@ to webkit.
 %package	python
 Summary:	Python binding for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 Requires:	pygobject2
@@ -232,7 +232,7 @@ This package contains Python binding files for %{name}
 %package	ruby
 Summary:	Ruby binding for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 Requires:	ruby(abi) = %{rubyabi}
@@ -246,7 +246,7 @@ This package contains Ruby binding files for %{name}
 %package	vala
 Summary:	Vala binding for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 # ???
@@ -258,7 +258,7 @@ This package contains Vala binding files for %{name}
 %package	devel
 Summary:	Development files for %{name}
 Version:	%{rpmver_c}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Group:		Development/Libraries
 
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
@@ -613,6 +613,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sun Mar 03 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.4.0.2-2.1
+- Mass rebuilt for Fedora 19 Features
+
 * Thu Dec 21 2011 Mamoru Tasaka <mtasaka@fedoraproject.org> - 2.4.0.2-2
 - Update plug-ins to 2.1
 
