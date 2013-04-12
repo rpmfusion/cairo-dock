@@ -16,11 +16,11 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		urlver		2.4
-%global		mainver	2.4.0
+%global		urlver		3.2
+%global		mainver	3.2.0
 #%%define		betaver	0rc1
-%global		postver_c	2
-%global		postver_p	2.1
+#%%global		postver_c	2
+#%%global		postver_p	2.1
 
 %global		rpmver_c	%{mainver}%{?postver_c:.%postver_c}
 %global		rpmver_p	%{mainver}%{?postver_p:.%postver_p}
@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -40,10 +40,10 @@
 
 # Bindings
 %global	build_python		1
-%{!?python_sitelib:	%global	python_sitelib	%(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
+%global	build_python3		1
 
 %global	build_ruby		0
-%global	rubyabi		1.8
+%global	rubyabi		1.9.1
 %global	ruby_sitearch		%(ruby -rrbconfig -e "puts Config::CONFIG['sitearchdir']")
 # FIXME
 # I don't know well about vala !!
@@ -54,7 +54,7 @@
 
 Name:		cairo-dock
 Version:	%{rpmver_c}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Summary:	Light eye-candy fully themable animated dock
 
 Group:		User Interface/Desktops
@@ -75,41 +75,32 @@ BuildRequires:	intltool
 
 # For main package
 BuildRequires:	dbus-glib-devel
-BuildRequires:	glitz-glx-devel
-BuildRequires:	gtk2-devel
-BuildRequires:	gtkglext-devel
+BuildRequires:	gtk3-devel
 BuildRequires:	libcurl-devel
 BuildRequires:	librsvg2-devel
 BuildRequires:	libXcomposite-devel
 BuildRequires:	libXinerama-devel
+BuildRequires:	libXrandr-devel
 BuildRequires:	libXrender-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	libXtst-devel
+BuildRequires:	libGLU-devel
 BuildRequires:	perl(XML::Parser)
 
 # For plug-ins
 BuildRequires:	alsa-lib-devel
 BuildRequires:	fftw3-devel
-%if 0%{?fedora} < 16
-# This is gnome2
 BuildRequires:	gnome-menus-devel
-%endif
-BuildRequires:	gnome-vfs2-devel
 BuildRequires:	libexif-devel
-BuildRequires:	libgnomeui-devel
 BuildRequires:	libical-devel
 BuildRequires:	libxklavier-devel
-BuildRequires:	libXrandr-devel
 BuildRequires:	libXxf86vm-devel
 BuildRequires:	libzeitgeist-devel
 BuildRequires:	pulseaudio-libs-devel
 #BuildRequires:	qt4-devel
 BuildRequires:	upower-devel
-BuildRequires:	vte-devel
-# Not shown in .pc files
-# Make it sure that cairo-dock is rebuilt against
-# newer libetpan
-BuildRequires:	libetpan-devel >= 1.1
+BuildRequires:	vte3-devel
+BuildRequires:	libetpan-devel
 BuildRequires:	lm_sensors-devel
 # For plug-ins-xfce
 %if %{build_xfce} > 0
@@ -118,16 +109,23 @@ BuildRequires:	Thunar-devel
 %if %{build_webkit} > 0
 # For plug-ins-webkit
 # Now using webkit, not gecko
-BuildRequires:	WebKit-gtk-devel
+BuildRequires:	webkitgtk3-devel
 %endif
 
 # Bindings
 %if %{build_python}
 BuildRequires:	python2-devel
 %endif
+%if %{build_python3}
+BuildRequires:	python3-devel
+%endif
 %if %{build_ruby}
+%if 0%{?fedora} >= 19
+BuildRequires:	ruby(release)
+%else
 BuildRequires:	ruby(abi) = %{rubyabi}
 BuildRequires:	ruby
+%endif
 BuildRequires:	ruby-devel
 %endif
 %if %{build_vala}
@@ -147,7 +145,7 @@ related to cairo-dock.
 %package	core
 Summary:	Core files for %{name}
 Version:	%{rpmver_c}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 # Requires related to commands used internally
 # in cairo-dock
@@ -177,7 +175,7 @@ This is the core package of cairo-dock.
 %package	plug-ins
 Summary:	Plug-ins files for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -187,7 +185,7 @@ This package contains plug-ins files for %{name}.
 %package	plug-ins-xfce
 Summary:	Plug-ins files for %{name} related to Xfce
 Version:	%{rpmver_p}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -198,7 +196,7 @@ to Xfce.
 %package	plug-ins-kde
 Summary:	Plug-ins files for %{name} related to KDE
 Version:	%{rpmver_p}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -209,7 +207,7 @@ to KDE.
 %package	plug-ins-webkit
 Summary:	Plug-ins files for %{name} related to Gecko
 Version:	%{rpmver_p}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 
@@ -220,7 +218,7 @@ to webkit.
 %package	python
 Summary:	Python binding for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 Requires:	pygobject2
@@ -229,13 +227,29 @@ Requires:	dbus-python
 %description	python
 This package contains Python binding files for %{name}
 
+%package	python3
+Summary:	Python3 binding for %{name}
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
+Group:		User Interface/Desktops
+Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	pygobject3
+Requires:	python3-dbus
+
+%description	python3
+This package contains Python3 binding files for %{name}
+
 %package	ruby
 Summary:	Ruby binding for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+%if 0%{?fedora} >= 19
+Requires:	ruby(release)
+%else
 Requires:	ruby(abi) = %{rubyabi}
+%endif
 Requires:	rubygems
 # The following is not in Fedora yet
 Requires:	rubygem(dbus)
@@ -246,7 +260,7 @@ This package contains Ruby binding files for %{name}
 %package	vala
 Summary:	Vala binding for %{name}
 Version:	%{rpmver_p}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 # ???
@@ -258,7 +272,7 @@ This package contains Vala binding files for %{name}
 %package	devel
 Summary:	Development files for %{name}
 Version:	%{rpmver_c}
-Release:	%{rpmrel}.1
+Release:	%{rpmrel}
 Group:		Development/Libraries
 
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
@@ -291,6 +305,7 @@ do
 	find $dir -type f | xargs chmod 0644
 done
 chmod 0644 [A-Z]*
+chmod 0755 */
 
 ## cmake issue
 sed -i.debuglevel \
@@ -331,7 +346,7 @@ sed -i.stat \
 ## Bindings
 # Ruby
 sed -i.site \
-	-e "s|CONFIG\['rubylibdir'\]|CONFIG['sitearchdir']|" \
+	-e "s|CONFIG\['rubylibdir'\]|CONFIG['vendorlibdir']|" \
 	CMakeLists.txt
 # Python
 ## FIXME
@@ -466,7 +481,7 @@ install -cpm 644 \
 	LGPL-2 \
 	LICENSE \
 	copyright \
-	data/ChangeLog.txt \
+	data/ChangeLog*.txt \
 	$TOPDIR/documents/main/
 
 popd # from cairo-dock
@@ -532,7 +547,7 @@ popd # from $RPM_BUILD_ROOT
 %doc	documents/main/*
 
 %{_bindir}/*%{name}*
-%{_libdir}/libgldi.so.2*
+%{_libdir}/libgldi.so.3*
 %{_datadir}/applications/%{name}*.desktop
 %{_datadir}/pixmaps/%{name}.svg
 
@@ -549,9 +564,10 @@ popd # from $RPM_BUILD_ROOT
 %{_datadir}/%{name}/scripts/
 %dir	%{_datadir}/%{name}/themes/
 %dir	%{_datadir}/%{name}/plug-ins/
-%{_datadir}/%{name}/themes/_default_/
-# only directory
+%{_datadir}/%{name}/themes/Default-Panel/
+%{_datadir}/%{name}/themes/Default-Single/
 %dir	%{_libdir}/%{name}/
+%{_libdir}/%{name}/libcd-Help.so
 
 %{_mandir}/man1/%{name}.1*
 
@@ -560,6 +576,8 @@ popd # from $RPM_BUILD_ROOT
 %doc	documents/plug-ins/*
 
 %{_libdir}/%{name}/*
+%exclude	%{_libdir}/%{name}/libcd-Help.so
+
 %{_datadir}/%{name}/plug-ins/*
 %if %{build_webkit} > 0
 %exclude	%{_libdir}/%{name}/*weblet*
@@ -600,6 +618,16 @@ popd # from $RPM_BUILD_ROOT
 %{python_sitelib}/*.egg-info
 %endif
 
+%if %{build_python3} > 0
+%files	python3
+%defattr(-,root,root,-)
+%{python3_sitelib}/CairoDock.py*
+%{python3_sitelib}/CDApplet.py*
+%{python3_sitelib}/CDBashApplet.py*
+%{python3_sitelib}/*.egg-info
+%{python3_sitelib}/__pycache__/
+%endif
+
 %if %{build_ruby} > 0
 %files	ruby
 %defattr(-,root,root,-)
@@ -613,6 +641,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Apr 12 2013 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.2.0-1
+- Update to 3.2.0
+
 * Sun Mar 03 2013 Nicolas Chauvet <kwizart@gmail.com> - 2.4.0.2-2.1
 - Mass rebuilt for Fedora 19 Features
 
