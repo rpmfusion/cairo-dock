@@ -17,7 +17,7 @@
 %global		build_other	1
 
 %global		urlver		3.2
-%global		mainver	3.2.0
+%global		mainver	3.2.1
 #%%define		betaver	0rc1
 #%%global		postver_c	2
 #%%global		postver_p	2.1
@@ -641,6 +641,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Apr 15 2013 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.2.1-1
+- Update to 3.2.1
+
 * Fri Apr 12 2013 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.2.0-1
 - Update to 3.2.0
 
