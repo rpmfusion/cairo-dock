@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -641,6 +641,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jul  8 2013 Mamoru TASAKA <mtasaka@fedoraproject.org>
+- F-20: rebuid against new libical
+
 * Mon Apr 15 2013 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.2.1-1
 - Update to 3.2.1
 
