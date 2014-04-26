@@ -54,7 +54,7 @@
 
 Name:		cairo-dock
 Version:	%{rpmver_c}
-Release:	%{rpmrel}
+Release:	%{rpmrel}.1
 Summary:	Light eye-candy fully themable animated dock
 
 Group:		User Interface/Desktops
@@ -641,6 +641,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Apr 26 2014 Nicolas Chauvet <kwizart@gmail.com> - 3.2.1-2.1
+- Rebuilt for libgcrypt
+
 * Mon Jul  8 2013 Mamoru TASAKA <mtasaka@fedoraproject.org>
 - F-20: rebuid against new libical
 
