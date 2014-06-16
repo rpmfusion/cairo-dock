@@ -16,8 +16,8 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		urlver		3.2
-%global		mainver	3.2.1
+%global		urlver		3.3
+%global		mainver	3.3.2
 #%%define		betaver	0rc1
 #%%global		postver_c	2
 #%%global		postver_p	2.1
@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -349,11 +349,6 @@ sed -i.site \
 	-e "s|CONFIG\['rubylibdir'\]|CONFIG['vendorlibdir']|" \
 	CMakeLists.txt
 # Python
-## FIXME
-sed -i.buildroot \
-	-e "s|--prefix=\\\${CMAKE_INSTALL_PREFIX}|--prefix=$TOPDIR/TMPINSTDIR/\\\${CMAKE_INSTALL_PREFIX}|" \
-	Dbus/interfaces/python/PythonInstall.cmake.in \
-	Dbus/interfaces/bash/BashInstall.cmake.in
 # Vala
 ## FIXME
 sed -i.vala \
@@ -641,6 +636,12 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jun 16 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.3.2-1
+- Update to 3.3.2
+
+* Sat Apr 26 2014 Nicolas Chauvet <kwizart@gmail.com> - 3.2.1-2.1
+- Rebuilt for libgcrypt
+
 * Mon Jul  8 2013 Mamoru TASAKA <mtasaka@fedoraproject.org>
 - F-20: rebuid against new libical
 
