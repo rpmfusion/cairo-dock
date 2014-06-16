@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -66,6 +66,10 @@ Source0:	%{name}-sources-%{betaver}.tar.bz2
 Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver_c:~%postver_c}%{?betaver:~%betaver}.tar.gz
 Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver_p:~%postver_p}%{?betaver:~%betaver}.tar.gz
 %endif
+# http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-plug-ins/plug-ins/revision/3083
+# http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-plug-ins/plug-ins/revision/3084
+Patch0:	cairo-dock-plugins-3.3.2-upower-099-r3083-modified.patch
+Patch1:	cairo-dock-plugins-3.3.2-upower-099-r3084-modified.patch
 
 BuildRequires:	cmake
 
@@ -325,6 +329,10 @@ sed -i.icon \
 
 # C. plug-ins
 cd ../plug-ins
+
+# Patch
+%patch0 -p1 -b .upower0
+%patch1 -p1 -b .upower1
 
 ## permission
 for dir in */
@@ -636,6 +644,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Jun 16 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.3.2-2
+- Fix build with upower 0.99
+
 * Mon Jun 16 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.3.2-1
 - Update to 3.3.2
 
