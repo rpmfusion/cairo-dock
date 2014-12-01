@@ -16,8 +16,8 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		urlver		3.3
-%global		mainver	3.3.2
+%global		urlver		3.4
+%global		mainver	3.4.0
 #%%define		betaver	0rc1
 #%%global		postver_c	2
 #%%global		postver_p	2.1
@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	3
+%global		fedora_main_rel	1
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -66,10 +66,6 @@ Source0:	%{name}-sources-%{betaver}.tar.bz2
 Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver_c:~%postver_c}%{?betaver:~%betaver}.tar.gz
 Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver_p:~%postver_p}%{?betaver:~%betaver}.tar.gz
 %endif
-# http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-plug-ins/plug-ins/revision/3083
-# http://bazaar.launchpad.net/~cairo-dock-team/cairo-dock-plug-ins/plug-ins/revision/3084
-Patch0:	cairo-dock-plugins-3.3.2-upower-099-r3083-modified.patch
-Patch1:	cairo-dock-plugins-3.3.2-upower-099-r3084-modified.patch
 
 BuildRequires:	cmake
 
@@ -89,6 +85,7 @@ BuildRequires:	libXrender-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	libXtst-devel
 BuildRequires:	libGLU-devel
+BuildRequires:	pkgconfig(wayland-client)
 BuildRequires:	perl(XML::Parser)
 
 # For plug-ins
@@ -106,6 +103,7 @@ BuildRequires:	upower-devel
 BuildRequires:	vte3-devel
 BuildRequires:	libetpan-devel
 BuildRequires:	lm_sensors-devel
+BuildRequires:	pkgconfig(indicator3-0.4)
 # For plug-ins-xfce
 %if %{build_xfce} > 0
 BuildRequires:	Thunar-devel
@@ -331,8 +329,6 @@ sed -i.icon \
 cd ../plug-ins
 
 # Patch
-%patch0 -p1 -b .upower0
-%patch1 -p1 -b .upower1
 
 ## permission
 for dir in */
@@ -644,6 +640,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Dec  1 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-1
+- 3.4.0
+
 * Sun Aug 24 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.3.2-3
 - F-21: rebuild against new upower
 
