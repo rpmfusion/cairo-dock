@@ -16,8 +16,8 @@
 # Set the below to 1 when building unstable plug-ins
 %global		build_other	1
 
-%global		urlver		3.3
-%global		mainver	3.3.2
+%global		urlver		3.4
+%global		mainver	3.4.0
 #%%define		betaver	0rc1
 #%%global		postver_c	2
 #%%global		postver_p	2.1
@@ -85,6 +85,7 @@ BuildRequires:	libXrender-devel
 BuildRequires:	libxml2-devel
 BuildRequires:	libXtst-devel
 BuildRequires:	libGLU-devel
+BuildRequires:	pkgconfig(wayland-client)
 BuildRequires:	perl(XML::Parser)
 
 # For plug-ins
@@ -102,6 +103,7 @@ BuildRequires:	upower-devel
 BuildRequires:	vte3-devel
 BuildRequires:	libetpan-devel
 BuildRequires:	lm_sensors-devel
+BuildRequires:	pkgconfig(indicator3-0.4)
 # For plug-ins-xfce
 %if %{build_xfce} > 0
 BuildRequires:	Thunar-devel
@@ -325,6 +327,8 @@ sed -i.icon \
 
 # C. plug-ins
 cd ../plug-ins
+
+# Patch
 
 ## permission
 for dir in */
@@ -636,6 +640,15 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Mon Dec  1 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-1
+- 3.4.0
+
+* Sun Aug 24 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.3.2-3
+- F-21: rebuild against new upower
+
+* Mon Jun 16 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.3.2-2
+- Fix build with upower 0.99
+
 * Mon Jun 16 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.3.2-1
 - Update to 3.3.2
 
