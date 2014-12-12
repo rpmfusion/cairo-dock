@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	1
+%global		fedora_main_rel	2
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -104,6 +104,8 @@ BuildRequires:	vte3-devel
 BuildRequires:	libetpan-devel
 BuildRequires:	lm_sensors-devel
 BuildRequires:	pkgconfig(indicator3-0.4)
+BuildRequires:	pkgconfig(dbusmenu-glib-0.4)
+BuildRequires:	pkgconfig(dbusmenu-gtk3-0.4)
 # For plug-ins-xfce
 %if %{build_xfce} > 0
 BuildRequires:	Thunar-devel
@@ -640,6 +642,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Dec 12 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-2
+- Build Messaging-Menu, Status-Notifier
+
 * Mon Dec  1 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-1
 - 3.4.0
 
