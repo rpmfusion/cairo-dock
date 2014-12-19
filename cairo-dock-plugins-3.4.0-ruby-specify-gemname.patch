@@ -1,0 +1,10 @@
+--- cairo-dock-plugins-3.4.0/Dbus/interfaces/ruby/CDApplet.rb.gem	2014-07-26 18:05:11.000000000 +0900
++++ cairo-dock-plugins-3.4.0/Dbus/interfaces/ruby/CDApplet.rb	2014-12-19 18:13:23.662837953 +0900
+@@ -21,6 +21,7 @@
+ #	 show the % of carge as quick info, and activate an alert message to be shown when the charge is critically low.
+ 
+ require 'rubygems'
++gem 'ruby-dbus'
+ require 'dbus'
+ require 'parseconfig'
+ 

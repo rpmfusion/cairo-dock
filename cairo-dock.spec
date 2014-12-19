@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	2
+%global		fedora_main_rel	3
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -42,9 +42,8 @@
 %global	build_python		1
 %global	build_python3		1
 
-%global	build_ruby		0
-%global	rubyabi		1.9.1
-%global	ruby_sitearch		%(ruby -rrbconfig -e "puts Config::CONFIG['sitearchdir']")
+%global	build_ruby		1
+%global	ruby_vendorlib		%(ruby -rrbconfig -e "puts Config::CONFIG['vendorlibdir']")
 # FIXME
 # I don't know well about vala !!
 %global	build_vala		0
@@ -66,6 +65,10 @@ Source0:	%{name}-sources-%{betaver}.tar.bz2
 Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-%{mainver}%{?postver_c:~%postver_c}%{?betaver:~%betaver}.tar.gz
 Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver_p:~%postver_p}%{?betaver:~%betaver}.tar.gz
 %endif
+# Specify gem name to surely use ruby-dbus
+Patch0:	cairo-dock-plugins-3.4.0-ruby-specify-gemname.patch
+# Ruby initialization fix
+Patch1:	cairo-dock-plugins-3.4.0-ruby-initialization.patch
 
 BuildRequires:	cmake
 
@@ -124,17 +127,11 @@ BuildRequires:	python2-devel
 BuildRequires:	python3-devel
 %endif
 %if %{build_ruby}
-%if 0%{?fedora} >= 19
 BuildRequires:	ruby(release)
-%else
-BuildRequires:	ruby(abi) = %{rubyabi}
-BuildRequires:	ruby
-%endif
 BuildRequires:	ruby-devel
 %endif
 %if %{build_vala}
-#?????
-# BuildRequires:	vala
+BuildRequires:	vala
 %endif
 
 # This is a meta package to install cairo-dock-core and
@@ -249,14 +246,9 @@ Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
-%if 0%{?fedora} >= 19
 Requires:	ruby(release)
-%else
-Requires:	ruby(abi) = %{rubyabi}
-%endif
-Requires:	rubygems
-# The following is not in Fedora yet
-Requires:	rubygem(dbus)
+Requires:	rubygem(ruby-dbus)
+Requires:	rubygem(parseconfig)
 
 %description	ruby
 This package contains Ruby binding files for %{name}
@@ -267,7 +259,6 @@ Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
-# ???
 Requires:	vala
 
 %description	vala
@@ -331,6 +322,8 @@ sed -i.icon \
 cd ../plug-ins
 
 # Patch
+%patch0 -p1 -b .gem
+%patch1 -p1 -b .rubyinit
 
 ## permission
 for dir in */
@@ -353,6 +346,11 @@ sed -i.stat \
 # Ruby
 sed -i.site \
 	-e "s|CONFIG\['rubylibdir'\]|CONFIG['vendorlibdir']|" \
+	CMakeLists.txt
+# ????
+sed -i.installdir \
+	-e '\@REGEX REPLACE.*RUBY@d' \
+	-e '\@set.*RUBY_LIB_DIR.*CMAKE_INSTALL_PREFIX.*RUBY_LIB_DIR_INSTALL@d' \
 	CMakeLists.txt
 # Python
 # Vala
@@ -632,7 +630,7 @@ popd # from $RPM_BUILD_ROOT
 %if %{build_ruby} > 0
 %files	ruby
 %defattr(-,root,root,-)
-%{ruby_sitearch}/CDApplet.rb
+%{ruby_vendorlib}/CDApplet.rb
 %endif
 
 %files	devel
@@ -642,6 +640,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Dec 19 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-3
+- Build ruby
+
 * Fri Dec 12 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-2
 - Build Messaging-Menu, Status-Notifier
 
