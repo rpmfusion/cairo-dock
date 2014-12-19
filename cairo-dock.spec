@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	4
+%global		fedora_main_rel	5
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -179,6 +179,10 @@ Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+# rpmfusion bug 3470
+# cairo-dock-launcher-API-daemon is written in python,
+# so for now make this depending on python
+Requires:	%{name}-python%{?_isa} = %{rpmver_p}-%{rpmrel}
 
 %description	plug-ins
 This package contains plug-ins files for %{name}.
@@ -188,7 +192,7 @@ Summary:	Plug-ins files for %{name} related to Xfce
 Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 
 %description	plug-ins-xfce
 This package contains plug-ins files for %{name} related
@@ -199,7 +203,7 @@ Summary:	Plug-ins files for %{name} related to KDE
 Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 
 %description	plug-ins-kde
 This package contains plug-ins files for %{name} related
@@ -210,7 +214,7 @@ Summary:	Plug-ins files for %{name} related to Gecko
 Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 
 %description	plug-ins-webkit
 This package contains plug-ins files for %{name} related
@@ -221,7 +225,7 @@ Summary:	Python binding for %{name}
 Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 Requires:	pygobject2
 Requires:	dbus-python
 
@@ -233,7 +237,7 @@ Summary:	Python3 binding for %{name}
 Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 Requires:	pygobject3
 Requires:	python3-dbus
 
@@ -245,7 +249,7 @@ Summary:	Ruby binding for %{name}
 Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 Requires:	ruby(release)
 Requires:	rubygem(ruby-dbus)
 Requires:	rubygem(parseconfig)
@@ -258,7 +262,7 @@ Summary:	Vala binding for %{name}
 Version:	%{rpmver_p}
 Release:	%{rpmrel}
 Group:		User Interface/Desktops
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 Requires:	vala
 
 %description	vala
@@ -270,7 +274,7 @@ Version:	%{rpmver_c}
 Release:	%{rpmrel}
 Group:		Development/Libraries
 
-Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 
 %description	devel
 The %{name}-devel package contains libraries, build data, and header
@@ -643,6 +647,10 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Dec 20 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-5
+- Make plug-ins depending on python(2), due to cairo-dock-launcher-API-daemon
+  dependency (bug 3470)
+
 * Fri Dec 19 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-4
 - Add Dbus demos
 
