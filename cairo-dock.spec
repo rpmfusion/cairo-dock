@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	3
+%global		fedora_main_rel	4
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -501,6 +501,9 @@ install -cpm 0644 \
 	LICENSE \
 	copyright \
 	$TOPDIR/documents/plug-ins/
+mkdir -p $TOPDIR/documents/plug-ins/Dbus
+cp -a Dbus/demos \
+	$TOPDIR/documents/plug-ins/Dbus/
 
 popd # from plug-ins
 
@@ -640,6 +643,9 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Fri Dec 19 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-4
+- Add Dbus demos
+
 * Fri Dec 19 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-3
 - Build ruby
 
