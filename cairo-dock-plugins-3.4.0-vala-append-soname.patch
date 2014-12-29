@@ -1,0 +1,45 @@
+From 2326408fb3ea63b78f0b0b5b13dcfa2070018e10 Mon Sep 17 00:00:00 2001
+From: Matthieu Baerts <matttbe@gmail.com>
+Date: Mon, 29 Dec 2014 01:39:23 +0100
+Subject: [PATCH] DBus: Vala: added soversion
+
+A version is needed for Vala interface's soname to track ABI changes
+---
+ CMakeLists.txt                          |  2 ++
+ Dbus/interfaces/vala/src/CMakeLists.txt | 10 ++++++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index fdd83a5..82e81c5 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -596,6 +596,8 @@ if (enable-vala-interface)
+ 	set (with_valac no)
+ 	find_program (VALAC_EXE valac)
+ 	message (STATUS "   Path to valac: ${VALAC_EXE}")
++	set (VERSION_VALA "1.0.0")
++	message (STATUS "   Cairo-Dock Vala interface's ABI version: ${VERSION_VALA}")
+ 
+ 	enable_if_not_defined (enable-vala-support)
+ 	if (NOT enable-vala-support)
+diff --git a/Dbus/interfaces/vala/src/CMakeLists.txt b/Dbus/interfaces/vala/src/CMakeLists.txt
+index d2dc97e..5b86d61 100644
+--- a/Dbus/interfaces/vala/src/CMakeLists.txt
++++ b/Dbus/interfaces/vala/src/CMakeLists.txt
+@@ -7,6 +7,16 @@ endif()
+ 
+ # now, compile it as any normal C lib.
+ add_library (${CDAPPLET} SHARED ${VALA_SRC_DIR}/${CDAPPLET}.c)
++STRING (REGEX REPLACE "\\..*" "" SOVERSION_VALA "${VERSION_VALA}")
++set_target_properties (${CDAPPLET} PROPERTIES
++	# create *nix style library versions + symbolic links
++	VERSION ${VERSION_VALA}
++	SOVERSION ${SOVERSION_VALA}
++	# allow creating static and shared libs without conflicts
++	#CLEAN_DIRECT_OUTPUT 1
++	# avoid conflicts between library and binary target names
++	#OUTPUT_NAME ${PROJECT_NAME}
++)
+ add_definitions (-fPIC -Wno-all)
+ 
+ pkg_check_modules ("CDAPPLET_DEPS" "gobject-2.0" "gio-2.0")
