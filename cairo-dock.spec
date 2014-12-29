@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	5
+%global		fedora_main_rel	6
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -44,9 +44,7 @@
 
 %global	build_ruby		1
 %global	ruby_vendorlib		%(ruby -rrbconfig -e "puts Config::CONFIG['vendorlibdir']")
-# FIXME
-# I don't know well about vala !!
-%global	build_vala		0
+%global	build_vala		1
 
 # For debugging
 %global	skip_main_build	0
@@ -66,9 +64,14 @@ Source0:	http://launchpad.net/cairo-dock-core/%{urlver}/%{mainver}%{?betaver:-%b
 Source2:	http://launchpad.net/cairo-dock-plug-ins/%{urlver}/%{mainver}%{?betaver:-%betaver}/+download/cairo-dock-plugins-%{mainver}%{?postver_p:~%postver_p}%{?betaver:~%betaver}.tar.gz
 %endif
 # Specify gem name to surely use ruby-dbus
+# Applied as 006353cc067e789e50d85790fbdb6c25e1398a63
 Patch0:	cairo-dock-plugins-3.4.0-ruby-specify-gemname.patch
 # Ruby initialization fix
+# Applied as b71aff98db0fe9d4a22ed1fb9c457da0c3023846
 Patch1:	cairo-dock-plugins-3.4.0-ruby-initialization.patch
+# Append soname for Vala interface
+# Upstream: 2326408fb3ea63b78f0b0b5b13dcfa2070018e10
+Patch2:	cairo-dock-plugins-3.4.0-vala-append-soname.patch
 
 BuildRequires:	cmake
 
@@ -268,6 +271,17 @@ Requires:	vala
 %description	vala
 This package contains Vala binding files for %{name}
 
+%package	vala-devel
+Summary:	Development files for Vala binding for %{name}
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
+Group:		Development/Libraries
+Requires:	%{name}-vala%{?_isa} = %{rpmver_p}-%{rpmrel}
+
+%description vala-devel
+This package contains development files for Vala
+binding for %{name}.
+
 %package	devel
 Summary:	Development files for %{name}
 Version:	%{rpmver_c}
@@ -328,6 +342,7 @@ cd ../plug-ins
 # Patch
 %patch0 -p1 -b .gem
 %patch1 -p1 -b .rubyinit
+%patch2 -p1 -b .valasoname
 
 ## permission
 for dir in */
@@ -357,11 +372,6 @@ sed -i.installdir \
 	-e '\@set.*RUBY_LIB_DIR.*CMAKE_INSTALL_PREFIX.*RUBY_LIB_DIR_INSTALL@d' \
 	CMakeLists.txt
 # Python
-# Vala
-## FIXME
-sed -i.vala \
-	-e '/with_vala /s|yes|no|' \
-	CMakeLists.txt
 
 popd # from opt/cairo-dock/trunk/cairo-dock
 
@@ -543,6 +553,10 @@ popd # from $RPM_BUILD_ROOT
 
 %post core -p /sbin/ldconfig
 %postun core -p /sbin/ldconfig
+%if %{build_vala} >= 0
+%post vala -p /sbin/ldconfig
+%postun vala -p /sbin/ldconfig
+%endif
 
 
 %files
@@ -640,13 +654,27 @@ popd # from $RPM_BUILD_ROOT
 %{ruby_vendorlib}/CDApplet.rb
 %endif
 
+%if %{build_vala} > 0
+%files vala
+%{_libdir}/libCDApplet.so.1*
+%{_datadir}/vala/vapi/CDApplet.*
+
+%files vala-devel
+%{_libdir}/libCDApplet.so
+%{_libdir}/pkgconfig/CDApplet.pc
+%endif
+
+
 %files	devel
 %defattr(-,root,root,-)
 %{_includedir}/%{name}/
 %{_libdir}/libgldi.so
-%{_libdir}/pkgconfig/*.pc
+%{_libdir}/pkgconfig/gldi.pc
 
 %changelog
+* Mon Dec 29 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-6
+- Enable vala interface
+
 * Sat Dec 20 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-5
 - Make plug-ins depending on python(2), due to cairo-dock-launcher-API-daemon
   dependency (bug 3470)
