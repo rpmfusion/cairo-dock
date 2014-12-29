@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	6
+%global		fedora_main_rel	7
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -45,6 +45,7 @@
 %global	build_ruby		1
 %global	ruby_vendorlib		%(ruby -rrbconfig -e "puts Config::CONFIG['vendorlibdir']")
 %global	build_vala		1
+%global	build_unstable 1
 
 # For debugging
 %global	skip_main_build	0
@@ -222,6 +223,17 @@ Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
 %description	plug-ins-webkit
 This package contains plug-ins files for %{name} related
 to webkit.
+
+%package	plug-ins-unstable
+Summary:	Unstable plug-ins not installed by default
+Version:	%{rpmver_p}
+Release:	%{rpmrel}
+Group:		User Interface/Desktops
+Requires:	%{name}-core%{?_isa} = %{rpmver_c}-%{rpmrel}
+
+%description	plug-ins-unstable
+This package contains unstable and experimental
+plug-ins not installed by default.
 
 %package	python
 Summary:	Python binding for %{name}
@@ -443,6 +455,13 @@ cd ..
 
 rm -f CMakeCache.txt
 %cmake \
+%if 0%{?build_unstable} >= 1
+	-Denable-disks=TRUE \
+	-Denable-doncky=TRUE \
+	-Denable-global-menu=TRUE \
+	-Denable-network-monitor=TRUE \
+	-Denable-scooby-do=TRUE \
+%endif
 	.
 
 ## Parallel make fails some times, but it is gerenally fast
@@ -609,6 +628,35 @@ popd # from $RPM_BUILD_ROOT
 %endif
 %exclude	%{_libdir}/%{name}/*kde*
 %exclude	%{_datadir}/%{name}/plug-ins/*kde*
+%if 0%{?build_unstable} >= 1
+%exclude	%{_libdir}/%{name}/appmenu-registrar
+%exclude	%{_libdir}/%{name}/libcd-Global-Menu.so
+%exclude	%{_libdir}/%{name}/libcd-disks.so
+%exclude	%{_libdir}/%{name}/libcd-doncky.so
+%exclude	%{_libdir}/%{name}/libcd-network-monitor.so
+%exclude	%{_libdir}/%{name}/libcd-scooby-do.so
+%exclude	%{_datadir}/%{name}/plug-ins/Disks/
+%exclude	%{_datadir}/%{name}/plug-ins/Doncky/
+%exclude	%{_datadir}/%{name}/plug-ins/Global-Menu/
+%exclude	%{_datadir}/%{name}/plug-ins/Network-Monitor/
+%exclude	%{_datadir}/%{name}/plug-ins/Scooby-Do/
+%endif
+
+%if 0%{?build_unstable} >= 1
+%files	plug-ins-unstable
+%defattr(-,root,root,-)
+%{_libdir}/%{name}/appmenu-registrar
+%{_libdir}/%{name}/libcd-Global-Menu.so
+%{_libdir}/%{name}/libcd-disks.so
+%{_libdir}/%{name}/libcd-doncky.so
+%{_libdir}/%{name}/libcd-network-monitor.so
+%{_libdir}/%{name}/libcd-scooby-do.so
+%{_datadir}/%{name}/plug-ins/Disks/
+%{_datadir}/%{name}/plug-ins/Doncky/
+%{_datadir}/%{name}/plug-ins/Global-Menu/
+%{_datadir}/%{name}/plug-ins/Network-Monitor/
+%{_datadir}/%{name}/plug-ins/Scooby-Do/
+%endif
 
 %if %{build_xfce} > 0
 %files	plug-ins-xfce
@@ -672,6 +720,10 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/gldi.pc
 
 %changelog
+* Mon Dec 29 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-7
+- Build unstable plug-ins (except for KDE experimental)
+  (not installed by default option)
+
 * Mon Dec 29 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-6
 - Enable vala interface
 
