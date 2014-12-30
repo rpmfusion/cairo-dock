@@ -29,7 +29,7 @@
 %global		build_webkit	1
 %global		build_xfce	1
 
-%global		fedora_main_rel	7
+%global		fedora_main_rel	8
 
 
 %global		fedora_rel	%{?pre_release:0.}%{fedora_main_rel}%{?betaver:.%betaver}
@@ -142,6 +142,11 @@ BuildRequires:	vala
 # cairo-dock-plug-ins
 Requires:	%{name}-core = %{rpmver_c}-%{rpmrel}
 Requires:	%{name}-plug-ins = %{rpmver_p}-%{rpmrel}
+# Per upstream request
+%if 0%{?build_xfce} >= 1
+Requires:	%{name}-plug-ins-xfce = %{rpmver_p}-%{rpmrel}
+%endif
+Requires:	%{name}-plug-ins-kde = %{rpmver_p}-%{rpmrel}
 
 %description
 This is a metapackage for installing all default packages
@@ -720,6 +725,10 @@ popd # from $RPM_BUILD_ROOT
 %{_libdir}/pkgconfig/gldi.pc
 
 %changelog
+* Tue Dec 30 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-8
+- Make -kde, -xfce installed as default, per request from
+  the upstream (no extra dependency will be added)
+
 * Mon Dec 29 2014 Mamoru TASAKA <mtasaka@fedoraproject.org> - 3.4.0-7
 - Build unstable plug-ins (except for KDE experimental)
   (not installed by default option)
